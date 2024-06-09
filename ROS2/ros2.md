@@ -1,0 +1,356 @@
+# ROS 2
+
+ROS merupakan sebuah _framework_ yang dirancang khusus untuk membuat aplikasi robot.
+
+## Instalasi
+
+Untuk contoh ini, kita akan melakukan instalasi ROS 2 distribusi Humble dalam sistem operasi Ubuntu / Lubuntu / Kubuntu / Xubuntu (pokoknya jangan Uwubuntu ataupun Winbuntu ataupun distro aneh2 lain) 22.04.
+
+Pada awalnya, pastikan locale kalian mensupport UTF-8. Apabila tidak, masukkan perintah-perintah berikut ke terminal.
+
+```shell
+locale  # check for UTF-8
+
+sudo apt update && sudo apt install locales
+sudo locale-gen en_US en_US.UTF-8
+sudo update-locale LC_ALL=en_US.UTF-8 LANG=en_US.UTF-8
+export LANG=en_US.UTF-8
+
+locale  # verify settings
+```
+Setelah itu, tambahkan repository Ubuntu Universe.
+```shell
+sudo apt install software-properties-common
+sudo add-apt-repository universe
+```
+Tambahkan GPG key ROS 2.
+```shell
+sudo apt update && sudo apt install curl -y
+sudo curl -sSL https://raw.githubusercontent.com/ros/rosdistro/master/ros.key -o /usr/share/keyrings/ros-archive-keyring.gpg
+```
+Dan tambahkan repository ke _source list_.
+```shell
+echo "deb [arch=$(dpkg --print-architecture) signed-by=/usr/share/keyrings/ros-archive-keyring.gpg] http://packages.ros.org/ros2/ubuntu $(. /etc/os-release && echo $UBUNTU_CODENAME) main" | sudo tee /etc/apt/sources.list.d/ros2.list > /dev/null
+```
+Setelah itu, install ROS 2 Humble.
+```shell
+sudo apt update
+sudo apt upgrade
+sudo apt install ros-$ROS_DISTRO-desktop
+```
+Dan lakukan setup ROS 2 Humble.
+```shell
+source /opt/ros/humble/setup.bash
+```
+
+Untuk memastikan ROS 2 Humble sudah terinstalasi, jalankan beberapa program ROS 2 Humble.
+
+```shell
+# Di satu terminal
+ros2 run demo_nodes_cpp talker
+
+# Di terminal lain
+ros2 run demo_nodes_cpp listener
+```
+
+Apabila tidak terdapat error, selamat! Kalian sudah melakukan instalasi ROS 2 Humble dengan baik dan benar :+1:
+
+## Konsep
+
+### Node
+
+Jaringan ROS 2 terdiri dari berbagai node. Setiap node ini biasanya menjalankan sebuah tugas tertentu, seperti mendapatkan data jarak dari LIDAR atau menggerakan roda robot. Setiap node dapat mengirim maupun mendapatkan data dari _topic_, _service_, maupun _action_.
+
+![node](https://docs.ros.org/en/humble/_images/Nodes-TopicandService.gif)
+
+Dalam ROS 2, sebuah _executable_ dapat memiliki satu atau lebih node. Untuk menjalankan sebuah node, kita dapat menggunakan perintah:
+
+```shell
+ros2 run <package> <executable>
+```
+
+### Topic
+
+_Topic_ berfungsi sebagai sebuah bus dalam komunikasi ROS 2. Mekanisme komunikasi mereka gak kenal diskriminasi. Oleh sebab itu, berbagai node dapat mengirim maupun mendapat data dari 1 topik yang sama secara terus menerus. Mereka hanya perlu _publish_ maupun _subsribe_ terhadap _topic_ tersebut.
+
+Namun, komunikasi mereka biasanya bersifat _one way_, dimana sebuah node dapat mendapat data dari sebuah topic namun tidak dapat mengirim kembali data tersebut lewat _topic_ yang sama.
+
+![topic](https://docs.ros.org/en/humble/_images/Topic-MultiplePublisherandMultipleSubscriber.gif)
+
+### Service
+
+Berbeda dengan metode komunikasi _topic_, _service_ hanya memberi data yang diinginkan apabila diminta oleh sebuah _client_. Respons yang dikirimkan oleh sebuah _service_ hanya ditujukan kepada _client_ yang memberi permintaan.
+
+![service](https://docs.ros.org/en/humble/_images/Service-MultipleServiceClient.gif)
+
+### Action
+
+_Action_ mirip dengan _service_, dimana mereka hanya memberikan respons kepada _client_ yang memberi sebuah permintaan. Namun, _service_ langsung mengakhiri layanannya setelah dipanggil sedangkan _action_ bertujuan untuk memberikan _feedback_ selama melakukan sebuah proses terhadap data yang diberikan.
+
+![action](https://docs.ros.org/en/humble/_images/Action-SingleActionClient.gif)
+
+### Interfaces
+
+Dalam kehidupan nyata, data yang dilewatkan dalam sistem robot kompleks dan bervariasi. Untungnya, ROS 2 menyediakan _interfaces_ untuk membuat struktur data sesuai keinginan kita.
+
+## Implementasi
+
+Dalam implementasi konsep-konsep sebelumnya, ROS 2 memberikan _client library_ yang mempermudah hidup pembuat robot.
+
+Akan tetapi, Banyu suka ribet. Untuk itu, kita menggunakan _client library_ C++ untuk contoh-contoh ini :moyai:.
+
+### Setup Workspace
+
+Workspace merupakan sebuah tempat dimana kita membuat _package_. Struktur sebuah workspace adalah seperti berikut.
+```
+ws
+    build
+    install
+    log
+    src
+        package1
+        package2
+        package3
+```
+
+Sebelum membuat sebuah aplikasi, kita perlu melakukan instalasi _build tool_. ROS 2 menggunakan `colcon` dalam melakukan _build_.
+
+```shell
+sudo apt update
+sudo apt upgrade
+sudo apt install python3-colcon-common-extensions
+```
+
+Dalam melakukan _build_, `colcon` akan menghasilkan 3 folder, yakni _build_, _install_, dan _log_.
+- _build_ berisi program-program hasil pembuatan.
+- _install_ berisi _package_ hasil pembuatan.
+- _log_ berisi catatan setiap pemanggilan `colcon`
+
+Setelah melakukan instalasi `colcon`, kita dapat mulai membuat aplikasi robot :smile:.
+
+### Topic
+
+Di folder `src`, buatlah sebuah package.
+
+```shell
+ros2 pkg create pubsub --build-type ament_cmake --dependencies rclcpp std_msgs --license Apache-2.0
+```
+
+Setelah menjalankan perintah tersebut, sebuah folder bernama `pubsub` akan muncul. Folder tersebut juga berisi
+
+```
+pubsub
+    src/
+    LICENSE
+    CMakeLists.txt
+    package.xml
+```
+
+Tambahkan file-file berikut ke dalam folder `pubsub/src`:
+
+`pub.cpp`
+```cpp
+#include <chrono>
+#include <functional>
+#include <memory>
+#include <string>
+
+#include "rclcpp/rclcpp.hpp"
+#include "std_msgs/msg/string.hpp"
+
+using std::chrono_literals;
+
+class Publisher : public rclcpp::Node
+{
+    rclcpp::TimerBase::SharedPtr timer_;
+    rclcpp::Publisher<std_msgs::msg::String>::SharedPtr pub_;
+
+    void timer_callback()
+    {
+        auto msg = std_msgs::msg::String();
+        msg.data = "Halo dunia!";
+
+        pub_->publish(msg);
+    }
+
+    public:
+        Publisher() : Node("pub") 
+        {
+            timer_ = this->create_wall_timer(
+                500ms, 
+                std::bind(&Publisher::timer_callback, this)
+            );
+
+            pub_ = this->create_publisher<std_msgs::msg::String>("topic", 10);
+        }
+};
+
+int main(int argc, char **argv)
+{
+    rclcpp::init(argc, argv);
+    rclcpp::spin(std::make_shared<Publisher>());
+    rclcpp::shutdown();
+    return 0;
+}
+```
+
+`sub.cpp`
+```cpp
+#include <chrono>
+#include <functional>
+#include <memory>
+#include <string>
+
+#include "rclcpp/rclcpp.hpp"
+#include "std_msgs/msg/string.hpp"
+
+using std::chrono_literals;
+using std::placeholders::_1;
+
+class Subscriber : public rclcpp::Node
+{
+    rclcpp::Subscription<std_msgs::msg::String>::SharedPtr sub_;
+
+    void topic_callback(const std_msgs::msg::String::SharedPtr msg)
+    {
+        RCLCPP_INFO(this->get_logger(), msg.data.c_str());
+    }
+
+    public:
+        Subscriber() : Node("node") 
+        {
+            sub_ = this->create_subscription<std_msgs::msg::String>(
+                "topic", 
+                10,
+                std::bind(&Subcriber::topic_callback, this, _1)
+            );
+        }
+};
+
+int main(int argc, char **argv)
+{
+    rclcpp::init(argc, argv);
+    rclcpp::spin(std::make_shared<Subscriber>());
+    rclcpp::shutdown();
+    return 0;
+}
+```
+
+Dan menambahkan _executable_ dalam `CMakeLists.txt`.
+```cmake
+add_executable(pub src/pub.cpp)
+ament_target_dependencies(pub rclcpp std_msgs)
+
+add_executable(sub src/sub.cpp)
+ament_target_dependencies(sub rclcpp std_msgs)
+
+install(
+    TARGETS pub sub
+    DESTINATION lib/${PROJECT_NAME}
+)
+```
+
+Lalu, lakukan _build_ dengan `colcon`.
+
+```shell
+colcon build
+```
+
+Apabila tidak terdapat error, jalankan perintah berikut.
+```shell
+# Di satu terminal
+ros2 run pubsub pub
+
+# Di terminal lain
+ros2 run pubsub sub
+```
+
+### Service
+
+Buatlah sebuah _package_ baru bernama `calculator` dalam folder `src`.
+```shell
+ros2 pkg create calculator --build-type ament_cmake --dependencies rclcpp std_msgs --license Apache-2.0
+```
+
+Setelah itu tambahkan file-file berikut ke dalam folder `calculator/src`
+
+`server.cpp`
+```cpp
+#include <memory>
+
+#include "rclcpp/rclcpp.hpp"
+#include "interfaces/srv/add.hpp"
+
+void add(const std::shared_ptr<interfaces::srv::Add::Request> req, std::shared_ptr<interfaces::srv::Add::Response> res)
+{
+    res->sum = req->a + req->b;
+    RCLCPP_INFO(rclcpp::get_logger("rclcpp"), "Requested %d + %d, Responded %d", req->a, req->b, res->sum);
+}
+
+int main(int argc, char **argv)
+{
+    rclcpp::init(argc, argv);
+
+    std::shared_ptr<rclcpp::Node> server = std::make_shared<rclcpp::Node>("add_server");
+
+    rclcpp::Service<interfaces::srv::Add>::SharedPtr adder = node->create_service<interfaces::srv::Add>("add", &add);
+
+    rclcpp::spin(server);
+    rclcpp::shutdown();
+
+    return 0;
+}
+```
+
+`client.cpp`
+```cpp
+#include <chrono>
+#include <memory>
+
+#include "rclcpp/rclcpp.hpp"
+#include "interfaces/srv/add.hpp"
+
+class Client : public rclcpp::Node
+{
+    rclcpp::TimerBase::SharedPtr timer_;
+
+    void timer_callback()
+    {
+        auto req = std::make_shared<interfaces::srv::Add::Request>();
+    }
+
+    public:
+        Client() : Node("client") {}
+};
+
+int main(int argc, char **argv)
+{
+    rclcpp::init(argc, argv);
+    rclcpp::shutdown();
+
+    return 0;
+}
+```
+
+### Action
+
+Buatlah sebuah _package_ baru bernama ``
+
+## Latihan
+
+Oh tidak! Seseorang terjatuh ke dalam sungai di Banyu City!
+
+![HEY!](https://media.tenor.com/x5XHcKYpO3wAAAAC/hey-a-man-has-fallen-into-a-river-in-lego-city.gif)
+1. Buatlah sebuah _package_ bernama `robosub` dan gunakan _package_ tersebut untuk soal-soal selanjutnya.
+2. Buatlah sebuah node bernama `finder` yang berfungsi untuk memberikan angka random dari 1 sampai 20 setiap 13 detik. Angka tersebut akan dikirim ke _topic_ bernama `target`
+3. Buatlah sebuah _service_ bernama `mul` yang melakukan perkalian 2 terhadap angka yang diberikan.
+4. Buatlah sebuah _action_ bernama `act` yang mendekati sebuah target. Bermula pada 1, pindahkan posisi robot ke target yang diinginkan sebanyak 1 setiap 1 detik. Dalam waktu 10 detik atau kurang, kembalikan boolean yang mengindikasikan apabila robot telah sampai ke target tepat waktu. Setelah itu, posisi awal berubah menjadi posisi sekarang.
+5. Buatlah sebuah node bernama `manager` yang berfungsi untuk mengambil data dari _topic_ `target` dan memanggil _service_ `mul`. Respons dari _service_ akan diberikan ke _action_ `act`. Beri sebuah indikasi apabila robot telah mencapai target sesuai `act`.
+6. Jalankan setiap program buatan dengan urutan:
+    - `act`
+    - `mul`
+    - `manager`
+    - `finder`
+
+## Referensi
+https://docs.ros.org/en/humble/Tutorials/Beginner-CLI-Tools.html
