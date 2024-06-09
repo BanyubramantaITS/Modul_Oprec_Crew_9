@@ -204,7 +204,7 @@ int main(int argc, char **argv)
 #include "rclcpp/rclcpp.hpp"
 #include "std_msgs/msg/string.hpp"
 
-using std::chrono_literals;
+using namespace std::chrono_literals;
 using std::placeholders::_1;
 
 class Subscriber : public rclcpp::Node
@@ -267,9 +267,46 @@ ros2 run pubsub sub
 
 ### Service
 
+Buatlah sebuah _package_ baru bernama `interfaces` dalam folder `src`. _Package_ ini akan berisi semua `msg`, `srv`, `action` buatan sendiri.
+```shell
+ros2 pkg create interfaces --build-type ament_cmake --dependencies std_msgs rosidl_default_generators --license Apache-2.0
+```
+
+Dalam `interfaces/src`, buatlah sebuah folder bernama `srv`. Dalam folder tersebut, buatlah sebuah file bernama `Add.srv` yang berisi:
+```srv
+int16 a
+int16 b
+---
+int16 sum
+```
+
+Dalam `package.xml`, tambahkan:
+```xml
+<exec_depend>rosidl_default_runtime</exec_depend>
+<member_of_group>rosidl_interface_packages</member_of_group>
+```
+
+Dalam `CMakeLists.txt`, tambahkan:
+```cmake
+rosidl_generate_interfaces(${PROJECT_NAME}
+    "srv/Add.srv"
+    DEPENDENCIES std_msgs
+)
+```
+
+Lakukan _build_.
+```shell
+colcon build
+```
+
+Dan source installasi.
+```shell
+. install/setup.bash
+```
+
 Buatlah sebuah _package_ baru bernama `calculator` dalam folder `src`.
 ```shell
-ros2 pkg create calculator --build-type ament_cmake --dependencies rclcpp std_msgs --license Apache-2.0
+ros2 pkg create calculator --build-type ament_cmake --dependencies rclcpp interfaces --license Apache-2.0
 ```
 
 Setelah itu tambahkan file-file berikut ke dalam folder `calculator/src`
@@ -281,7 +318,8 @@ Setelah itu tambahkan file-file berikut ke dalam folder `calculator/src`
 #include "rclcpp/rclcpp.hpp"
 #include "interfaces/srv/add.hpp"
 
-void add(const std::shared_ptr<interfaces::srv::Add::Request> req, std::shared_ptr<interfaces::srv::Add::Response> res)
+void add(const std::shared_ptr<interfaces::srv::Add::Request> req, 
+         std::shared_ptr<interfaces::srv::Add::Response> res)
 {
     res->sum = req->a + req->b;
     RCLCPP_INFO(rclcpp::get_logger("rclcpp"), "Requested %d + %d, Responded %d", req->a, req->b, res->sum);
@@ -310,31 +348,130 @@ int main(int argc, char **argv)
 #include "rclcpp/rclcpp.hpp"
 #include "interfaces/srv/add.hpp"
 
-class Client : public rclcpp::Node
-{
-    rclcpp::TimerBase::SharedPtr timer_;
-
-    void timer_callback()
-    {
-        auto req = std::make_shared<interfaces::srv::Add::Request>();
-    }
-
-    public:
-        Client() : Node("client") {}
-};
-
 int main(int argc, char **argv)
 {
     rclcpp::init(argc, argv);
+
+    std::shared_ptr<rclcpp::Node> node = std::make_shared<rclcpp::Node>("client");
+    rclcpp::Client<interfaces::srv::Add>::SharedPtr client = node->create_client<interfaces::srv::Add>("add");
+
+    auto req = std::make_shared<interfaces::srv::Add::Request>();
+    req->a = atoi(argv[1]);
+    req->b = atoi(argv[2]);
+
+    while (client->wait_for_service(1s))
+    {
+        if (!rclcpp::ok())
+        {
+            RCLCPP_ERROR(node->get_logger(), "Terminated");
+            return -1;
+        }
+
+        RCLCPP_INFO(node->get_logger(), "Waiting for service");
+    }
+
+    auto res = client->async_send_request(req);
+
+    if (rclcpp::spin_until_future_complete(node, res) == rclcpp::FutureReturnCode::SUCCESS)
+        RCLCPP_INFO(node->get_logger(), "Sum: %d", res->sum);
+    else
+        RCLCPP_ERROR(node->get_logger(), "Failed to call service");
+
     rclcpp::shutdown();
 
     return 0;
 }
 ```
 
+Dalam `CMakeLists.txt`, tambahkan:
+```cmake
+add_executable(server src/server.cpp)
+ament_target_dependencies(server rclcpp interfaces)
+
+add_executable(client src/client.cpp)
+ament_target_dependencies(client rclcpp interfaces)
+
+install(
+    TARGETS server client
+    DESTINATION lib/${PROJECT_NAME}
+)
+```
+
 ### Action
 
+Dalam package _interfaces_, buatlah folder baru bernama `action`. Dalam folder tersebut, tambahkan file `Prime.action` yang berisi:
+```action
+int16 num
+---
+bool is_prime
+---
+bool partial_prime
+```
+
 Buatlah sebuah _package_ baru bernama ``
+
+`server.cpp`
+```cpp
+#include <functional>
+#include <memory>
+#include <thread>
+
+#include "rclcpp/rclcpp.hpp"
+#include "rclcpp_action/rclcpp_action.hpp"
+#include "interfaces/action/prime.hpp"
+
+using namespace std::placeholders;
+
+class IsPrimeServer : public rclcpp::Node
+{
+    rclcpp_action::Server<IsPrime>::SharedPtr server;
+
+    void execute(const std::shared_ptr<GoalHandleIsPrime> goal_handle)
+    {
+        auto feedback = std::make_shared<IsPrime::Feedback>();
+    } 
+
+    public:
+
+        using IsPrime = interfaces::action::Prime;
+        using GoalHandleIsPrime = rclcpp_action::ServerGoalHandle<IsPrime>;
+
+        explicit IsPrimeServer(const rclcpp::NodeOptions &options = rclcpp::NodeOptions()) : Node("is_prime_server")
+        {
+            auto handle_goal = [this](
+                const rclcpp_action::GoalHandle::GoalUUID &uuid, 
+                std::shared_ptr<const IsPrime::Goal> goal)
+            {
+                (void)uuid;
+                return rclcpp_action::GoalResponse::ACCEPT_AND_EXECUTE;
+            };
+
+            auto handle_cancel = [this](const std::shared_ptr<GoalHandleIsPrime> goal_handle)
+            {
+                (void)goal_handle;
+                return rclcpp_action::GoalResponse::ACCEPT;
+            }
+
+            auto handle_accepted = [this](const std::shared_ptr<GoalHandleIsPrime> goal_handle)
+            {
+                auto execute_in_thread = [this, goal_handle](){ return this->execute(goal_handle) };
+                std::thread(execute_in_thread).detach();
+            }
+
+            this->server = this->create_server<IsPrime>(
+                this,
+                "is_prime",
+                &handle_goal,
+                &handle_cancel,
+                &handle_accepted
+            );
+        }
+};
+```
+
+`client.cpp`
+```cpp
+```
 
 ## Latihan
 
@@ -342,7 +479,7 @@ Oh tidak! Seseorang terjatuh ke dalam sungai di Banyu City!
 
 ![HEY!](https://media.tenor.com/x5XHcKYpO3wAAAAC/hey-a-man-has-fallen-into-a-river-in-lego-city.gif)
 1. Buatlah sebuah _package_ bernama `robosub` dan gunakan _package_ tersebut untuk soal-soal selanjutnya.
-2. Buatlah sebuah node bernama `finder` yang berfungsi untuk memberikan angka random dari 1 sampai 20 setiap 13 detik. Angka tersebut akan dikirim ke _topic_ bernama `target`
+2. Buatlah sebuah node bernama `finder` yang berfungsi untuk memberikan angka random dari 1 sampai 20 setiap 10 detik. Angka tersebut akan dikirim ke _topic_ bernama `target`
 3. Buatlah sebuah _service_ bernama `mul` yang melakukan perkalian 2 terhadap angka yang diberikan.
 4. Buatlah sebuah _action_ bernama `act` yang mendekati sebuah target. Bermula pada 1, pindahkan posisi robot ke target yang diinginkan sebanyak 1 setiap 1 detik. Dalam waktu 10 detik atau kurang, kembalikan boolean yang mengindikasikan apabila robot telah sampai ke target tepat waktu. Setelah itu, posisi awal berubah menjadi posisi sekarang.
 5. Buatlah sebuah node bernama `manager` yang berfungsi untuk mengambil data dari _topic_ `target` dan memanggil _service_ `mul`. Respons dari _service_ akan diberikan ke _action_ `act`. Beri sebuah indikasi apabila robot telah mencapai target sesuai `act`.
