@@ -1,6 +1,8 @@
 # ROS 2
 
-ROS merupakan sebuah _framework_ yang dirancang khusus untuk membuat aplikasi robot.
+ROS merupakan sebuah _framework_ yang dirancang khusus untuk membuat aplikasi robot. ROS memiliki banyak driver, algoritma, dan alat-alat lainnya yang dapat membantu _developer_ untuk membuat robot dengan _robust_. Tak hanya itu, ROS bersifat _open source_, sehingga selain adanya transparansi untuk para _developer_, ROS juga **gratis**.
+
+![ketika ada yang gratis:](https://th.bing.com/th/id/OIP.gC_D-cCr9EsmXnc7XTNU4QAAAA?rs=1&pid=ImgDetMain)
 
 ## Instalasi
 
