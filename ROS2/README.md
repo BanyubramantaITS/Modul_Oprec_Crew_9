@@ -473,21 +473,11 @@ class IsPrimeServer : public rclcpp::Node
 ```cpp
 ```
 
-## Latihan
+## Tugas
 
-Oh tidak! Seseorang terjatuh ke dalam sungai di Banyu City!
+Buatlah sebuah node controller yang mendapatkan input joystick XBox dan mengirimkan perintah pergerakan `x`, `y`, `depth`, dan `yaw`. Namun kalian juga dibebaskan untuk menambahkan perintah-perintah yang lain.
 
-![HEY!](https://media.tenor.com/x5XHcKYpO3wAAAAC/hey-a-man-has-fallen-into-a-river-in-lego-city.gif)
-1. Buatlah sebuah _package_ bernama `robosub` dan gunakan _package_ tersebut untuk soal-soal selanjutnya.
-2. Buatlah sebuah node bernama `finder` yang berfungsi untuk memberikan angka random dari 1 sampai 20 setiap 10 detik. Angka tersebut akan dikirim ke _topic_ bernama `target`
-3. Buatlah sebuah _service_ bernama `mul` yang melakukan perkalian 2 terhadap angka yang diberikan.
-4. Buatlah sebuah _action_ bernama `act` yang mendekati sebuah target. Bermula pada 1, pindahkan posisi robot ke target yang diinginkan sebanyak 1 setiap 1 detik. Dalam waktu 10 detik atau kurang, kembalikan boolean yang mengindikasikan apabila robot telah sampai ke target tepat waktu. Setelah itu, posisi awal berubah menjadi posisi sekarang.
-5. Buatlah sebuah node bernama `manager` yang berfungsi untuk mengambil data dari _topic_ `target` dan memanggil _service_ `mul`. Respons dari _service_ akan diberikan ke _action_ `act`. Beri sebuah indikasi apabila robot telah mencapai target sesuai `act`.
-6. Jalankan setiap program buatan dengan urutan:
-    - `act`
-    - `mul`
-    - `manager`
-    - `finder`
+Untuk mendapat input dari joystick XBOX, kalian dapat menggunakan package [joy](http://wiki.ros.org/joy).
 
 ## Referensi
 https://docs.ros.org/en/humble/Tutorials/Beginner-CLI-Tools.html
