@@ -2,7 +2,9 @@
 
 ROS merupakan sebuah _framework_ yang dirancang khusus untuk membuat aplikasi robot. ROS memiliki banyak driver, algoritma, dan alat-alat lainnya yang dapat membantu _developer_ untuk membuat robot dengan _robust_. Tak hanya itu, ROS bersifat _open source_, sehingga selain adanya transparansi untuk para _developer_, ROS juga **gratis**.
 
-![ketika ada yang gratis:](https://th.bing.com/th/id/OIP.gC_D-cCr9EsmXnc7XTNU4QAAAA?rs=1&pid=ImgDetMain)
+<div align="center">
+<img alt="ketika ada yang gratis" src="https://th.bing.com/th/id/OIP.gC_D-cCr9EsmXnc7XTNU4QAAAA?rs=1&pid=ImgDetMain" />
+</div>
 
 ## Instalasi
 
@@ -20,27 +22,37 @@ export LANG=en_US.UTF-8
 
 locale  # verify settings
 ```
+
 Setelah itu, tambahkan repository Ubuntu Universe.
+
 ```shell
 sudo apt install software-properties-common
 sudo add-apt-repository universe
 ```
+
 Tambahkan GPG key ROS 2.
+
 ```shell
 sudo apt update && sudo apt install curl -y
 sudo curl -sSL https://raw.githubusercontent.com/ros/rosdistro/master/ros.key -o /usr/share/keyrings/ros-archive-keyring.gpg
 ```
+
 Dan tambahkan repository ke _source list_.
+
 ```shell
 echo "deb [arch=$(dpkg --print-architecture) signed-by=/usr/share/keyrings/ros-archive-keyring.gpg] http://packages.ros.org/ros2/ubuntu $(. /etc/os-release && echo $UBUNTU_CODENAME) main" | sudo tee /etc/apt/sources.list.d/ros2.list > /dev/null
 ```
+
 Setelah itu, install ROS 2 Humble.
+
 ```shell
 sudo apt update
 sudo apt upgrade
 sudo apt install ros-$ROS_DISTRO-desktop
 ```
+
 Dan lakukan setup ROS 2 Humble.
+
 ```shell
 source /opt/ros/humble/setup.bash
 ```
@@ -104,6 +116,7 @@ Akan tetapi, Banyu suka ribet. Untuk itu, kita menggunakan _client library_ C++ 
 ### Setup Workspace
 
 Workspace merupakan sebuah tempat dimana kita membuat _package_. Struktur sebuah workspace adalah seperti berikut.
+
 ```
 ws
     build
@@ -124,9 +137,10 @@ sudo apt install python3-colcon-common-extensions
 ```
 
 Dalam melakukan _build_, `colcon` akan menghasilkan 3 folder, yakni _build_, _install_, dan _log_.
-- _build_ berisi program-program hasil pembuatan.
-- _install_ berisi _package_ hasil pembuatan.
-- _log_ berisi catatan setiap pemanggilan `colcon`
+
+-   _build_ berisi program-program hasil pembuatan.
+-   _install_ berisi _package_ hasil pembuatan.
+-   _log_ berisi catatan setiap pemanggilan `colcon`
 
 Setelah melakukan instalasi `colcon`, kita dapat mulai membuat aplikasi robot :smile:.
 
@@ -151,6 +165,7 @@ pubsub
 Tambahkan file-file berikut ke dalam folder `pubsub/src`:
 
 `pub.cpp`
+
 ```cpp
 #include <chrono>
 #include <functional>
@@ -176,10 +191,10 @@ class Publisher : public rclcpp::Node
     }
 
     public:
-        Publisher() : Node("pub") 
+        Publisher() : Node("pub")
         {
             timer_ = this->create_wall_timer(
-                500ms, 
+                500ms,
                 std::bind(&Publisher::timer_callback, this)
             );
 
@@ -197,6 +212,7 @@ int main(int argc, char **argv)
 ```
 
 `sub.cpp`
+
 ```cpp
 #include <chrono>
 #include <functional>
@@ -219,10 +235,10 @@ class Subscriber : public rclcpp::Node
     }
 
     public:
-        Subscriber() : Node("node") 
+        Subscriber() : Node("node")
         {
             sub_ = this->create_subscription<std_msgs::msg::String>(
-                "topic", 
+                "topic",
                 10,
                 std::bind(&Subcriber::topic_callback, this, _1)
             );
@@ -239,6 +255,7 @@ int main(int argc, char **argv)
 ```
 
 Dan menambahkan _executable_ dalam `CMakeLists.txt`.
+
 ```cmake
 add_executable(pub src/pub.cpp)
 ament_target_dependencies(pub rclcpp std_msgs)
@@ -259,6 +276,7 @@ colcon build
 ```
 
 Apabila tidak terdapat error, jalankan perintah berikut.
+
 ```shell
 # Di satu terminal
 ros2 run pubsub pub
@@ -270,11 +288,13 @@ ros2 run pubsub sub
 ### Service
 
 Buatlah sebuah _package_ baru bernama `interfaces` dalam folder `src`. _Package_ ini akan berisi semua `msg`, `srv`, `action` buatan sendiri.
+
 ```shell
 ros2 pkg create interfaces --build-type ament_cmake --dependencies std_msgs rosidl_default_generators --license Apache-2.0
 ```
 
 Dalam `interfaces/src`, buatlah sebuah folder bernama `srv`. Dalam folder tersebut, buatlah sebuah file bernama `Add.srv` yang berisi:
+
 ```srv
 int16 a
 int16 b
@@ -283,12 +303,14 @@ int16 sum
 ```
 
 Dalam `package.xml`, tambahkan:
+
 ```xml
 <exec_depend>rosidl_default_runtime</exec_depend>
 <member_of_group>rosidl_interface_packages</member_of_group>
 ```
 
 Dalam `CMakeLists.txt`, tambahkan:
+
 ```cmake
 rosidl_generate_interfaces(${PROJECT_NAME}
     "srv/Add.srv"
@@ -297,16 +319,19 @@ rosidl_generate_interfaces(${PROJECT_NAME}
 ```
 
 Lakukan _build_.
+
 ```shell
 colcon build
 ```
 
 Dan source installasi.
+
 ```shell
 . install/setup.bash
 ```
 
 Buatlah sebuah _package_ baru bernama `calculator` dalam folder `src`.
+
 ```shell
 ros2 pkg create calculator --build-type ament_cmake --dependencies rclcpp interfaces --license Apache-2.0
 ```
@@ -314,13 +339,14 @@ ros2 pkg create calculator --build-type ament_cmake --dependencies rclcpp interf
 Setelah itu tambahkan file-file berikut ke dalam folder `calculator/src`
 
 `server.cpp`
+
 ```cpp
 #include <memory>
 
 #include "rclcpp/rclcpp.hpp"
 #include "interfaces/srv/add.hpp"
 
-void add(const std::shared_ptr<interfaces::srv::Add::Request> req, 
+void add(const std::shared_ptr<interfaces::srv::Add::Request> req,
          std::shared_ptr<interfaces::srv::Add::Response> res)
 {
     res->sum = req->a + req->b;
@@ -343,6 +369,7 @@ int main(int argc, char **argv)
 ```
 
 `client.cpp`
+
 ```cpp
 #include <chrono>
 #include <memory>
@@ -386,6 +413,7 @@ int main(int argc, char **argv)
 ```
 
 Dalam `CMakeLists.txt`, tambahkan:
+
 ```cmake
 add_executable(server src/server.cpp)
 ament_target_dependencies(server rclcpp interfaces)
@@ -402,6 +430,7 @@ install(
 ### Action
 
 Dalam package _interfaces_, buatlah folder baru bernama `action`. Dalam folder tersebut, tambahkan file `Prime.action` yang berisi:
+
 ```action
 int16 num
 ---
@@ -413,6 +442,7 @@ bool partial_prime
 Buatlah sebuah _package_ baru bernama ``
 
 `server.cpp`
+
 ```cpp
 #include <functional>
 #include <memory>
@@ -431,7 +461,7 @@ class IsPrimeServer : public rclcpp::Node
     void execute(const std::shared_ptr<GoalHandleIsPrime> goal_handle)
     {
         auto feedback = std::make_shared<IsPrime::Feedback>();
-    } 
+    }
 
     public:
 
@@ -441,7 +471,7 @@ class IsPrimeServer : public rclcpp::Node
         explicit IsPrimeServer(const rclcpp::NodeOptions &options = rclcpp::NodeOptions()) : Node("is_prime_server")
         {
             auto handle_goal = [this](
-                const rclcpp_action::GoalHandle::GoalUUID &uuid, 
+                const rclcpp_action::GoalHandle::GoalUUID &uuid,
                 std::shared_ptr<const IsPrime::Goal> goal)
             {
                 (void)uuid;
@@ -472,7 +502,9 @@ class IsPrimeServer : public rclcpp::Node
 ```
 
 `client.cpp`
+
 ```cpp
+
 ```
 
 ## Tugas
@@ -482,4 +514,5 @@ Buatlah sebuah node controller yang mendapatkan input joystick XBox dan mengirim
 Untuk mendapat input dari joystick XBOX, kalian dapat menggunakan package [joy](http://wiki.ros.org/joy).
 
 ## Referensi
+
 https://docs.ros.org/en/humble/Tutorials/Beginner-CLI-Tools.html
