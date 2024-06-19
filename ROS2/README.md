@@ -450,6 +450,7 @@ Buatlah sebuah _package_ baru bernama ``
 
 #include "rclcpp/rclcpp.hpp"
 #include "rclcpp_action/rclcpp_action.hpp"
+#include "rclcpp_components/register_node_macro.hpp"
 #include "interfaces/action/prime.hpp"
 
 using namespace std::placeholders;
@@ -460,7 +461,30 @@ class IsPrimeServer : public rclcpp::Node
 
     void execute(const std::shared_ptr<GoalHandleIsPrime> goal_handle)
     {
+        const auto goal = goal_handle->get_goal();
         auto feedback = std::make_shared<IsPrime::Feedback>();
+        auto result = std::make_shared<IsPrime::Result>();
+
+        if (goal->num < 2 && rclcpp::ok())
+        {
+            result->is_prime = false;
+            goal_handle->succeed(result);
+            return;
+        }
+
+        int i;
+
+        for (i = 2; i < goal && rclcpp::ok(); i++)
+        {
+            feedback->partial_prime = !(goal->num % i);
+            goal_handle->publish_feedback(feedback);
+        }
+
+        if (rclcpp::ok())
+        {
+            result->is_prime = !(goal->num % i);
+            goal_handle->succeed(result);
+        }
     }
 
     public:
@@ -499,19 +523,100 @@ class IsPrimeServer : public rclcpp::Node
             );
         }
 };
+
+RCLCPP_COMPONENTS_REGISTER_NODE(IsPrimeServer)
 ```
 
 `client.cpp`
 
 ```cpp
+#include <functional>
+#include <future>
+#include <memory>
 
+#include "rclcpp/rclcpp.hpp"
+#include "rclcpp_action/rclcpp_action.hpp"
+#include "rclcpp_components/register_node_macro.hpp"
+#include "interfaces/action/prime.hpp"
+
+using namespace std::placeholders;
+
+class IsPrimeClient : public rclcpp::Node
+{
+    rclcpp_action::Client<IsPrime>::SharedPtr client;
+
+    void goal_response_callback(const GoalHandleIsPrime::SharedPtr &goal_handle)
+    {
+        if (!goal_handle)
+            RCLCPP_ERROR(this->get_logger(), "Goal denied");
+        else
+            RCLCPP_INFO(this->get_logger(), "Goal accepted");
+    }
+
+    void feedback_callback(
+        GoalHandleIsPrime::SharedPtr /*goal_handle*/, 
+        const std::shared_ptr<const IsPrime::Feedback> feedback
+    )
+    {
+        RCLCPP_INFO(this->get_logger(), feedback->partial_prime ? "prime" : "not prime");
+    }
+
+    void result_callback(const GoalHandleIsPrime::WrappedResult &result)
+    {
+        switch (result.code)
+        {
+            case rclcpp_action::ResultCode::SUCCEEDED:
+                break;
+            case rclcpp_action::ResultCode::ABORTED:
+                RCLCPP_ERROR(this->get_logger(), "Aborted");
+                return;
+            case rclcpp_action::ResultCode::CANCELLED:
+                RCLCPP_ERROR(this->get_logger(), "Cancelled");
+                return;
+            default:
+                RCLCPP_ERROR(this->get_logger(), "Unknown result code");
+                return;
+        }
+
+        RCLCPP_INFO(this->get_logger(), "Final result: %s", result.is_prime ? "prime" : "not prime");
+        rclcpp::shutdown();
+    }
+
+    public:
+
+        using IsPrime = interfaces::action::Prime;
+        using GoalHandleIsPrime = rclcpp_action::ServerGoalHandle<IsPrime>;
+
+        explicit FibonacciActionClient(const rclcpp::NodeOptions &options) : Node("is_prime_client", options)
+        {
+            this->client = rclcpp_action::create_client<IsPrime>(
+                this,
+                "is_prime"
+            );
+        }
+
+        void send_goal()
+        {
+            auto goal = IsPrime::Goal();
+            goal.num = 50;
+
+            auto send_goal_options = rclcpp_action::Client<IsPrime>::SendGoalOptions();
+            send_goal_options.goal_response_callback = std::bind(&IsPrimeClient::goal_response_callback, this, _1);
+            send_goal_options.feedback_callback = std::bind(&IsPrimeClient::feedback_callback, this, _1, _2);
+            send_goal_options.result_callback = std::bind(&IsPrimeClient::result_callback, this, _1);
+
+            this->client->async_senc_goal(goal, send_goal_options);
+        }
+};
+
+RCLCPP_COMPONENTS_REGISTER_NODE(IsPrimeClient)
 ```
 
 ## Tugas
 
 Buatlah sebuah node controller yang mendapatkan input joystick XBox dan mengirimkan perintah pergerakan `x`, `y`, `depth`, dan `yaw`. Namun kalian juga dibebaskan untuk menambahkan perintah-perintah yang lain.
 
-Untuk mendapat input dari joystick XBOX, kalian dapat menggunakan package [joy](http://wiki.ros.org/joy).
+Untuk mendapat input dari joystick XBox, kalian dapat menggunakan package [joy](http://wiki.ros.org/joy).
 
 ## Referensi
 
