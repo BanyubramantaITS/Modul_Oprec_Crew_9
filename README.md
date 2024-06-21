@@ -6,12 +6,12 @@ Selamat datang para calon-calon Crew 8 Banyubramanta, ini adalah modul Open Recr
 
 | Materi                    | Keterangan |
 |---------------------------|------------|
-|ROS2      | Framework programming robot, inti dari inti |
-|OpenCV    | Digunakan untuk algoritma color detection |
-|YOLO      | Digunakan untuk algoritma image detection |
-|Serial Communication | Komunikasi antar robot ke microcontroller STM32 |
-|Behavior Tree | Sistem untuk menentukan program yang berjalan di robot yang berbentuk tree|
-|GAZEBO | Program simulasi robot (sering digunakan karena robot kita dibawah air)
+|[ROS2](ROS2)     | Framework programming robot, inti dari inti |
+|[OpenCV](<OpenCV + YOLO>)    | Digunakan untuk algoritma color detection |
+|[YOLO](<OpenCV + YOLO>)      | Digunakan untuk algoritma image detection |
+|[Serial Communication](<Serial Communication>) | Komunikasi antar robot ke microcontroller STM32 |
+|[Behavior Tree](<Behavior Tree>) | Sistem untuk menentukan program yang berjalan di robot yang berbentuk tree|
+|[GAZEBO](Gazebo) | Program simulasi robot (sering digunakan karena robot kita dibawah air)
 
 # Ubuntu
 
