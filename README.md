@@ -2,7 +2,7 @@
 
 Selamat datang para calon-calon Crew 8 Banyubramanta, ini adalah modul Open Recruitment untuk mempersiapkan kalian terhadap tugas-tugas di Banyubramanta nantinya. Selamat belajar!
 
-# Learning Tree
+## Learning Tree
 
 | Materi                    | Keterangan |
 |---------------------------|------------|
@@ -13,7 +13,9 @@ Selamat datang para calon-calon Crew 8 Banyubramanta, ini adalah modul Open Recr
 |Behavior Tree | Sistem untuk menentukan program yang berjalan di robot yang berbentuk tree|
 |GAZEBO | Program simulasi robot (sering digunakan karena robot kita dibawah air)
 
-# Prerequisites
+# Ubuntu
+
+## Prerequisites
 
 Karena kita menggunakan framework dan program diatas, kita memerlukan OS **Ubuntu**. Ubuntu yang dipakai yaitu Ubuntu 22.04 (Jammy Jellyfish) dikarenakan kecocokannya dengan versi ROS2 yang akan kita pakai nantinya.
 
@@ -79,4 +81,22 @@ Kemudian lanjutkan proses instalasi kalian, dan...
 
 Kalian sekarang bisa switch antara Windows dan Linux setiap kali kalian boot.
 
- Sekarang kalian bisa melanjutkan ke ROS2~
+# Git
+
+Singkatnya, Git merupakan sebuah alat untuk para developer (kita, dan kalian) gunakan untuk saling berkolaborasi. GitHub/GitLab merupakan service yang membuat repository kalian di host di cloud, yang memungkinan kolaborasi yang efektif.
+
+Sebelum itu, kalian bisa melihat tutorial Git/GitHub agar kalian bisa memahami cara menggunakan Git untuk di Banyubramanta nantinya di link berikut:
+[W3Schools - Git Tutorial](https://www.w3schools.com/git/)
+
+Link diatas mencakup bagian yang paling dipakai di Git, yang tentunya nanti kalian akan paling banyak pakai juga. Tetapi ada beberapa note, yaitu:
+
+- Pakai git pull --rebase, jangan git pull biasa: commit history lebih clean
+- **Jangan pakai -f untuk melakukan apapun. -f berarti force, yang akan melakukan command yang kalian pakai dengan paksa: menghilangkan commit history**
+- Penggunaan submodules
+  - Misalkan kalian sedang mengerjakan sesuatu, dan kemudian kode kalian butuh kode orang lain. Kalian git clone ke repo kalian.
+  - Misal memakai git clone, kalau di push tidak akan masuk. Sehingga ada namanya git submodules.
+  - Submodules berguna untuk membuat suatu repository menjadi subrepository di repository lain.
+  - Memakai git submodule memungkinan kalian untuk membuat kode orang lain menjadi bagian dari kode kalian, dan bisa diclone oleh orang lain.
+  - Untuk penjelasan lebih lengkap terkait submodules ada di [sini](https://git-scm.com/book/en/v2/Git-Tools-Submodules).
+
+Sekarang kalian bisa melanjutkan ke ROS2~
