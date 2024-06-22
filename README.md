@@ -13,6 +13,21 @@ Selamat datang para calon-calon Crew 8 Banyubramanta, ini adalah modul Open Recr
 |[Behavior Tree](<Behavior Tree>) | Sistem untuk menentukan program yang berjalan di robot yang berbentuk tree|
 |[GAZEBO](Gazebo) | Program simulasi robot (sering digunakan karena robot kita dibawah air)
 
+## Daftar Isi
+- [Welcome!](#welcome)
+  - [Learning Tree](#learning-tree)
+  - [Daftar Isi](#daftar-isi)
+- [Ubuntu](#ubuntu)
+  - [Prerequisites](#prerequisites)
+  - [Install file .iso (Image Ubuntu)](#install-file-iso-image-ubuntu)
+  - [Install Rufus](#install-rufus)
+    - [Input .iso ke flashdisk](#input-iso-ke-flashdisk)
+    - [Restart device dengan kondisi USB plugged in](#restart-device-dengan-kondisi-usb-plugged-in)
+  - [Install Ubuntu](#install-ubuntu)
+- [Git](#git)
+- [ble.sh (autocomplete)](#blesh-autocomplete)
+- [Terminal Emulators](#terminal-emulators)
+
 # Ubuntu
 
 ## Prerequisites
@@ -27,7 +42,7 @@ Untuk melakukan install Ubuntu sebenarnya ada berbagai cara, tetapi kita menggun
 - Flashdisk / filesystem (omagad sisop) flash lainnya (8GB+)
 - Rufus / aplikasi lain yang bisa membuat `.iso` masuk ke USB drive kalian dan menjadi sebuah bootable USB drive.
 
-### Install file .iso (Image Ubuntu)
+## Install file .iso (Image Ubuntu)
 
 Kalian bisa memilih distro Ubuntu kalian dulu. (ingat pakai Ubuntu 22.04, file bisa ditaruh dimanapun)
 
@@ -36,7 +51,7 @@ Kalian bisa memilih distro Ubuntu kalian dulu. (ingat pakai Ubuntu 22.04, file b
 - Lubuntu: https://lubuntu.me/downloads/
 - Xubuntu: https://xubuntu.org/download/
 
-### Install Rufus
+## Install Rufus
 Kalian bisa install Rufus melalui link ini (versi bebas, disarankan versi 3.13.*): https://rufus.ie/en/
 
 **~~beli flashdisk~~** misal kalian tidak punya, atau ingin langsung install Ubuntu biasa bisa minta ke kita :grinning:
@@ -59,7 +74,7 @@ Setelah membuat bootable USB drive, kalian bisa restart laptop kalian dan masuk 
 Setelah kalian masuk, seharusnya kalian ada di welcome screen Ubuntu.
 ![welcome](assets/welcome.png)
 
-### Install Ubuntu
+## Install Ubuntu
 
 Disarankan memakai minimal installation untuk meminimalisir bloatware.
 
@@ -77,9 +92,7 @@ https://www.youtube.com/watch?v=Fjy4gUB_asM
 
 Kemudian lanjutkan proses instalasi kalian, dan...
 
-### Selesai!
-
-Kalian sekarang bisa switch antara Windows dan Linux setiap kali kalian boot.
+**Selesai!** Kalian sekarang bisa switch antara Windows dan Linux setiap kali kalian boot.
 
 # Git
 
@@ -99,7 +112,7 @@ Link diatas mencakup bagian yang paling dipakai di Git, yang tentunya nanti kali
   - Memakai git submodule memungkinan kalian untuk membuat kode orang lain menjadi bagian dari kode kalian, dan bisa diclone oleh orang lain.
   - Untuk penjelasan lebih lengkap terkait submodules ada di [sini](https://git-scm.com/book/en/v2/Git-Tools-Submodules).
 
-# ble.sh (for BASH - .bashrc)
+# ble.sh (autocomplete)
 
 Karena kalian akan membuka terminal setiap hari, pasti mau fitur autocomplete kan? Nah karena itu makanya ada ble.sh. Kalian bisa memakai ini misal terminal kalian sekarang menggunakan BASH. Misal kalian memakai zsh, bisa skip bagian ini karena seharusnya sudah ada autocompletion.
 
