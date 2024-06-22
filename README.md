@@ -98,6 +98,12 @@ Kemudian lanjutkan proses instalasi kalian, dan...
 
 Singkatnya, Git merupakan sebuah alat untuk para developer (kita, dan kalian) gunakan untuk saling berkolaborasi. GitHub/GitLab merupakan service yang membuat repository kalian di host di cloud, yang memungkinan kolaborasi yang efektif.
 
+Instalasi Git dapat dilakukan dengan command berikut:
+
+```bash
+sudo apt install git gawk make -y
+```
+
 Sebelum itu, kalian bisa melihat tutorial Git/GitHub agar kalian bisa memahami cara menggunakan Git untuk di Banyubramanta nantinya di link berikut:
 [W3Schools - Git Tutorial](https://www.w3schools.com/git/)
 
