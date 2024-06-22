@@ -144,7 +144,7 @@ Berikut beberapa contoh terminal emulator beserta kelebihan/kelemahannya:
 |----------------------------|-----------------------------------------------------|-----------------------------------|
 | Terminator                 | Usage CPU + RAM yang ringan.                        | Tampilan yang kurang memukau.     |
 | Tilix                      | Dukungan layout yang fleksibel.                     | Lebih berat dari Terminator.      |
-| Kitty                      | Penggunaan GPU untuk melakukan rendering.           | Konfigurasi awal yang rumit, dan RAM usage tinggi.   |
-| Alacritty                  | Performa sangat cepat. (GPU-accerelated, OpenGL)    | Kurangnya dukungan tab native, RAM usage tinggi.    |
+| Kitty                      | Penggunaan GPU untuk melakukan rendering, tampilan yang bagus setelah dikonfigurasi.           | Konfigurasi awal yang rumit, dan RAM usage tinggi.   |
+| Alacritty                  | Performa sangat cepat, tampilan yang bagus. (GPU-accerelated, OpenGL)    | Kurangnya dukungan tab native, RAM usage tinggi.    |
 
 Sekarang kalian bisa melanjutkan ke ROS2~
