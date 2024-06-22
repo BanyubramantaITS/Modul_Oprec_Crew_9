@@ -99,4 +99,33 @@ Link diatas mencakup bagian yang paling dipakai di Git, yang tentunya nanti kali
   - Memakai git submodule memungkinan kalian untuk membuat kode orang lain menjadi bagian dari kode kalian, dan bisa diclone oleh orang lain.
   - Untuk penjelasan lebih lengkap terkait submodules ada di [sini](https://git-scm.com/book/en/v2/Git-Tools-Submodules).
 
+# ble.sh (for BASH - .bashrc)
+
+Karena kalian akan membuka terminal setiap hari, pasti mau fitur autocomplete kan? Nah karena itu makanya ada ble.sh. Kalian bisa memakai ini misal terminal kalian sekarang menggunakan BASH. Misal kalian memakai zsh, bisa skip bagian ini karena seharusnya sudah ada autocompletion.
+
+Untuk cek terminal sekarang bisa memakai `neofetch`.
+
+Command installasi:
+
+```bash
+cd ~
+git clone --recursive --depth 1 --shallow-submodules https://github.com/akinomyoga/ble.sh.git
+make -C ble.sh install PREFIX=~/.local
+echo 'source ~/.local/share/blesh/ble.sh' >> ~/.bashrc
+source ~/.bashrc
+```
+
+# Terminal Emulators
+
+Sebenarnya ada banyak terminal emulator yang bisa kalian pakai, tetapi untuk di mini PC Banyu nanti pakai **Terminator** karena dia paling ringan diantara emulator yang lain, dan tidak menggunakan GPU. Terminal emulator sendiri kita gunakan untuk bisa membuka banyak terminal dalam satu session/window, sehingga lebih mudah untuk melihat output program yang dijalankan secara simultaneous. 
+
+Berikut beberapa contoh terminal emulator beserta kelebihan/kelemahannya:
+
+| Terminal Emulator          | Kelebihan                                           | Kelemahan                         |
+|----------------------------|-----------------------------------------------------|-----------------------------------|
+| Terminator                 | Usage CPU + RAM yang ringan.                        | Tampilan yang kurang memukau.     |
+| Tilix                      | Dukungan layout yang fleksibel.                     | Lebih berat dari Terminator.      |
+| Kitty                      | Penggunaan GPU untuk melakukan rendering.           | Konfigurasi awal yang rumit, dan RAM usage tinggi.   |
+| Alacritty                  | Performa sangat cepat. (GPU-accerelated, OpenGL)    | Kurangnya dukungan tab native, RAM usage tinggi.    |
+
 Sekarang kalian bisa melanjutkan ke ROS2~
