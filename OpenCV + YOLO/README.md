@@ -44,44 +44,64 @@ sudo apt install libopencv-dev -y
 
 **Read, Display, Write Image**
 
-Read
+Read - Pembacaan suatu gambar dilakukan dengan fungsi imread().
 
 ```c++
 imread(filename, flags)
 ```
 
-- filename:
-- flags: 
+- filename: berisi path ke file gambar
+- flags: opsional, berisi argumen-argumen yang membuat pemrosesan gambar lebih spesifik
 
-Display
+Display - Jika ingin menampilkan suatu gambar, bisa dilakukan dengan fungsi imshow().
 
 ```c++
 imshow(windowname, image)
 ```
 
-- windowname: 
-- image: 
+- windowname: berisi nama window yang akan ditampilkan
+- image: berisi path ke variabel (Mat) gambar
 
-Write
+Write - Penulisan suatu gambar dilakukan dengan fungsi imread().
 
 ```c++
 imwrite(filename, image)
 ```
 
-- filename:
-- image:
+- filename: berisi path untuk melakukan save
+- image: berisi path ke variabel (Mat) gambar
 
 **Penggunaan**
 
-```bash
+Berikut adalah penggunaan sederhana dari OpenCV yang menggunakan fungsi-fungsi diatas.
 
+```c++
+// library
+#include<opencv2/opencv.hpp>
+#include<iostream>
+
+// namespaces
+using namespace std;
+using namespace cv;
+
+Mat img_grayscale = imread("test.jpg", 0); // read
+imshow("grayscale image", img_grayscale); // display
+
+waitKey(0); // wait for a keystroke
+destroyAllWindows(); // Destroys all the windows created
+
+imwrite("grayscale.jpg", img_grayscale); // write
 ```
 
 ### Color Spaces
 
 **RGB**
 
+
+
 **HSV**
+
+
 
 ### Operasi Basic
 
