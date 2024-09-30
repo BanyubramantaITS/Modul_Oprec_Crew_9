@@ -118,14 +118,14 @@ Akan tetapi, Banyu suka ribet. Untuk itu, kita menggunakan _client library_ C++ 
 Workspace merupakan sebuah tempat dimana kita membuat _package_. Struktur sebuah workspace adalah seperti berikut.
 
 ```
-ws
-    build
-    install
-    log
-    src
-        package1
-        package2
-        package3
+ws/
+| build/
+| install/
+| log/
++ src/
+  | package1
+  | package2
+  + package3
 ```
 
 Sebelum membuat sebuah aplikasi, kita perlu melakukan instalasi _build tool_. ROS 2 menggunakan `colcon` dalam melakukan _build_.
@@ -156,10 +156,10 @@ Setelah menjalankan perintah tersebut, sebuah folder bernama `pubsub` akan muncu
 
 ```
 pubsub
-    src/
-    LICENSE
-    CMakeLists.txt
-    package.xml
+| src/
+| LICENSE
+| CMakeLists.txt
++ package.xml
 ```
 
 Tambahkan file-file berikut ke dalam folder `pubsub/src`:
