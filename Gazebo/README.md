@@ -30,6 +30,8 @@ ign gazebo
 
 ### Gazebo Sim
 
+Gazebo Sim merupakan versi Gazebo terbaru. Gazebo Sim menyediakan lebih banyak sensor dan kapabilitas untuk simulasi skala besar seperti simulasi robot beregu.
+
 ## Konsep
 
 Dalam Gazebo, terdapat berbagai konsep yang perlu dipahami untuk membuat simulasi. Berikut konsep-konsep tersebut.
