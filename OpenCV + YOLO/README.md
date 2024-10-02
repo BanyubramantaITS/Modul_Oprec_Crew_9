@@ -95,13 +95,41 @@ imwrite("grayscale.jpg", img_grayscale); // write
 
 ### Color Spaces
 
+**BGR**
+
+<div align="center">
+<img alt="RGB Color Space" src="https://docs.opencv.org/3.4/Threshold_inRange_RGB_colorspace.jpg" />
+</div>
+
+Format BGR merupakan format default yang digunakan oleh OpenCV untuk membaca dan menulis gambar. Color space ini memiliki elemen:
+1. Blue
+2. Green
+3. Red
+
 **RGB**
 
-
+Sama dengan BGR. Bedanya, posisi _channel_ B dan R ditukar. Format ini merupakan format yang banyak perangkat gunakan untuk membaca dan mengeluarkan gambar. Color space ini memiliki elemen:
+1. Red
+2. Green
+3. Blue
 
 **HSV**
 
+<div align="center">
+<div style="background-color: white; max-width: 24em;">
+<img alt="HSV Color Space" src="https://buzzneers.com/wp-content/uploads/2020/08/HSV_color_solid_cylinder-2048x1536.png" />
+</div>
+</div>
 
+Berbeda dengan Color space lainnya, HSV hanya menggunakan satu _channel_ (Hue) untuk mendeskripsikan warna dan channel lainnya menggunakan warna. Biasanya color space ini berguna untuk menentukan warna tanpa dipengaruhi oleh cahaya.
+
+**Grayscale**
+
+<div align="center">
+<img alt="Grayscale Color Space" src="https://i0.wp.com/theailearner.com/wp-content/uploads/2018/10/Capture.png?resize=539%2C238&ssl=1" />
+</div>
+
+Grayscale memperhitungkan semua aspek gambar dalam satu channel. Biasanya color space ini digunakan apabila tujuan pemrosesan gambar tidak memperhitungkan warna.
 
 ### Operasi Basic
 
@@ -115,9 +143,43 @@ https://docs.opencv.org/3.4/d0/d86/tutorial_py_image_arithmetics.html
 
 ## Convolutional Neural Network (CNN)
 
+CNN merupakan sebuah algoritma _deep learning_ yang bertujuan untuk mempelajari data spatial (seperti gambar, objek 3D, dan video)
+
+### Basics
+
+**Tensor** merupakan matriks berdimensi-N. Dalam CNN gambar, biasanya memiliki Tensor 3 dimensi (_channel_, _height_, _width_) sebagai input.
+
+**Neuron** merupakan sebuah fungsi yang memiliki berbagai input dan mengeluarkan suatu output.
+
+**Weights dan bias** merupakan parameter (seperti koefisien dan konstanta) dalam setiap neuron. Parameter ini lah yang akan berubah
+
+**Layer** merupakan sekumpulan neuron yang melakukan suatu operasi yang sama.
+
+### Convolutional Layer
+
+Layer ini melakukan proses konvolusi pada input yang diberikan. Konvolusi merupakan proses perhitungan iteratif kernel pada setiap posisi dalam gambar.
+
+### Pooling Layer
+
+Pooling layer bertujuan untuk mereduksi data spatial yang akan dikeluarkan dengan menggunakan kernel. Terdapat berbagai cara untuk melakukan hal tersebut, seperti mengambil nilai terbesar (Max pooling) dan mengambil rata-rata (Average pooling).
+
+### Fully Connected Layer
+
+Fully connected layer dapat diibaratkan seperti struktur otak, dimana setiap neuron terhubung dengan setiap neuron di layer selanjutnya.
+
+### Activation
+
+Fungsi aktifasi menentukan transformasi akhir keluaran sebuah neuron.
+
+### Visualizer
+
+Penjelasan lebih lanjut dan visualisasi CNN dapat dilihat di [visualizer ini](https://poloclub.github.io/cnn-explainer/)
+
 ## Pengenalan YOLO
 
 ## Instalasi
+
+Dalam contoh kali ini, kita akan menggunakan model YOLOv5
 
 **Prerequisite**
 
@@ -232,4 +294,9 @@ model = YOLO("<path__file.pt>")
 
 ## Integrasi dengan ROS2
 
-## YOLO di C++
+Untuk mengintegrasi model kalian dengan ROS, kalian dapat mengirimkan gambar lewat sebuah topic dalam bentuk `sensor_msgs/msg/Image` dan membuat gambar tersebut sebagai masukan dari model YOLO.
+
+Terdapat banyak cara untuk membuka dan membaca file model YOLO kita, seperti menggunakan `cv::dnn`. Namun, kita akan menggunakan OpenVINO (Open Visual Inference and Neural Network Optimization) dengan alasan:
+- OpenVINO menyediakan hardware support Intel bagi berbagai macam AI
+- Mini PC kita menggunakan hardware Intel
+- Intel supremacy
