@@ -159,17 +159,33 @@ CNN merupakan sebuah algoritma _deep learning_ yang bertujuan untuk mempelajari 
 
 Layer ini melakukan proses konvolusi pada input yang diberikan. Konvolusi merupakan proses perhitungan iteratif kernel pada setiap posisi dalam gambar.
 
+<div align="center">
+<img alt="Convolutional Layer" src="https://coolgpu.github.io/coolgpu_blog/assets/images/Conv2d_0p_1s_1inCh.gif" />
+</div>
+
 ### Pooling Layer
 
 Pooling layer bertujuan untuk mereduksi data spatial yang akan dikeluarkan dengan menggunakan kernel. Terdapat berbagai cara untuk melakukan hal tersebut, seperti mengambil nilai terbesar (Max pooling) dan mengambil rata-rata (Average pooling).
+
+<div align="center">
+<img alt="Pooling Layer" src="https://www.educative.io/api/edpresso/shot/6600568793989120/image/5613117829021696" />
+</div>
 
 ### Fully Connected Layer
 
 Fully connected layer dapat diibaratkan seperti struktur otak, dimana setiap neuron terhubung dengan setiap neuron di layer selanjutnya.
 
+<div align="center">
+<img alt="Fully Connected Layer" src="https://builtin.com/sites/www.builtin.com/files/styles/ckeditor_optimize/public/inline-images/3_fully-connected-layer_0.jpg" />
+</div>
+
 ### Activation
 
 Fungsi aktifasi menentukan transformasi akhir keluaran sebuah neuron.
+
+<div align="center">
+<img alt="Activation Layer" src="https://aman.ai/primers/ai/assets/activation/1.png" />
+</div>
 
 ### Visualizer
 
