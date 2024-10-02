@@ -85,7 +85,7 @@ ros2 run <package> <executable>
 
 ### Topic
 
-_Topic_ berfungsi sebagai sebuah bus dalam komunikasi ROS 2. Mekanisme komunikasi mereka gak kenal diskriminasi. Oleh sebab itu, berbagai node dapat mengirim maupun mendapat data dari 1 topik yang sama secara terus menerus. Mereka hanya perlu _publish_ maupun _subsribe_ terhadap _topic_ tersebut.
+_Topic_ berfungsi sebagai sebuah bus dalam komunikasi ROS 2. Mekanisme komunikasi mereka gak kenal diskriminasi. Oleh sebab itu, berbagai node dapat mengirim maupun mendapat data dari 1 topik yang sama secara terus menerus. Mereka hanya perlu _publish_ maupun _subscribe_ terhadap _topic_ tersebut.
 
 Namun, komunikasi mereka biasanya bersifat _one way_, dimana sebuah node dapat mendapat data dari sebuah topic namun tidak dapat mengirim kembali data tersebut lewat _topic_ yang sama.
 
