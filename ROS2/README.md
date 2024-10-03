@@ -1,5 +1,22 @@
 # ROS 2
 
+## Daftar Isi
+
+- [Definisi](#definisi)
+- [Instalasi](#instalasi)
+- [Konsep](#konsep)
+  - [Topic](#topic)
+  - [Service](#service)
+  - [Action](#action)
+  - [Interfaces](#interfaces)
+- [Praktik](#implementasi)
+  - [Setup Workspace](#setup-workspace)
+  - [Topic](#topic-1)
+  - [Service](#service-1)
+  - [Action](#action-1)
+
+## Definisi
+
 ROS merupakan sebuah _framework_ yang dirancang khusus untuk membuat aplikasi robot. ROS memiliki banyak driver, algoritma, dan alat-alat lainnya yang dapat membantu _developer_ untuk membuat robot dengan _robust_. Tak hanya itu, ROS bersifat _open source_, sehingga selain adanya transparansi untuk para _developer_, ROS juga **gratis**.
 
 <div align="center">
@@ -278,11 +295,8 @@ colcon build
 Apabila tidak terdapat error, jalankan perintah berikut.
 
 ```shell
-# Di satu terminal
-ros2 run pubsub pub
-
-# Di terminal lain
-ros2 run pubsub sub
+ros2 run pubsub pub # Di satu terminal
+ros2 run pubsub sub # Di terminal lain
 ```
 
 ### Service
@@ -427,6 +441,8 @@ install(
 )
 ```
 
+Jalan perintah berikut dalam 
+
 ### Action
 
 Dalam package _interfaces_, buatlah folder baru bernama `action`. Dalam folder tersebut, tambahkan file `Fibonnaci.action` yang berisi:
@@ -439,7 +455,12 @@ int32[] sequence
 int32[] partial_sequence
 ```
 
-Buatlah sebuah _package_ baru bernama `fibonnaci`
+Buatlah sebuah _package_ baru bernama `fibonnaci` dengan menjalankan perintah berikut:
+```shell
+ros2 pkg create fibonnaci --build-type ament_cmake --dependencies rclcpp rclcpp_action rclcpp_components interfaces --license Apache2.0
+```
+
+Setelah itu, tambahkan file-file berikut:
 
 `include/fibonnaci/visibility_control.h`
 ```cpp
@@ -493,7 +514,7 @@ extern "C"
 #include <memory>
 #include <thread>
 
-#include "action_tutorials_interfaces/action/fibonacci.hpp"
+#include "interfaces/action/fibonacci.hpp"
 #include "rclcpp/rclcpp.hpp"
 #include "rclcpp_action/rclcpp_action.hpp"
 #include "rclcpp_components/register_node_macro.hpp"
@@ -596,7 +617,7 @@ RCLCPP_COMPONENTS_REGISTER_NODE(action_tutorials_cpp::FibonacciActionServer)
 #include <string>
 #include <sstream>
 
-#include "action_tutorials_interfaces/action/fibonacci.hpp"
+#include "interfaces/action/fibonacci.hpp"
 
 #include "rclcpp/rclcpp.hpp"
 #include "rclcpp_action/rclcpp_action.hpp"
@@ -703,9 +724,62 @@ private:
 RCLCPP_COMPONENTS_REGISTER_NODE(action_tutorials_cpp::FibonacciActionClient)
 ```
 
+Lalu tambahkan ini dalam `CMakeLists.txt`
+
+```cmake
+add_library(action_server SHARED
+  src/fibonacci_action_server.cpp)
+target_include_directories(action_server PRIVATE
+  $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include>
+  $<INSTALL_INTERFACE:include>)
+target_compile_definitions(action_server
+  PRIVATE "ACTION_TUTORIALS_CPP_BUILDING_DLL")
+ament_target_dependencies(action_server
+  "interfaces"
+  "rclcpp"
+  "rclcpp_action"
+  "rclcpp_components")
+rclcpp_components_register_node(action_server PLUGIN "action_tutorials_cpp::FibonacciActionServer" EXECUTABLE fibonacci_action_server)
+install(TARGETS
+  action_server
+  ARCHIVE DESTINATION lib
+  LIBRARY DESTINATION lib
+  RUNTIME DESTINATION bin)
+
+add_library(action_client SHARED
+  src/client.cpp)
+target_include_directories(action_client PRIVATE
+  $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include>
+  $<INSTALL_INTERFACE:include>)
+target_compile_definitions(action_client
+  PRIVATE "ACTION_TUTORIALS_CPP_BUILDING_DLL")
+ament_target_dependencies(action_client
+  "action_tutorials_interfaces"
+  "rclcpp"
+  "rclcpp_action"
+  "rclcpp_components")
+rclcpp_components_register_node(action_client PLUGIN "action_tutorials_cpp::FibonacciActionClient" EXECUTABLE fibonacci_action_client)
+install(TARGETS
+  action_client
+  ARCHIVE DESTINATION lib
+  LIBRARY DESTINATION lib
+  RUNTIME DESTINATION bin)
+```
+
+Lalu jalankan perintah ini di direktori workspace:
+```shell
+colcon build
+```
+
+Setelah proses _build_ selesai, jalankan:
+```shell
+ros2 run fibonacci server # Di satu terminal
+ros2 run fibonacci client # Di terminal lain
+```
+
 ## Tugas
 
-Buatlah sebuah node controller yang mendapatkan input joystick XBox dan mengirimkan perintah pergerakan `x`, `y`, `depth`, dan `yaw`. Namun kalian juga dibebaskan untuk menambahkan perintah-perintah yang lain.
+Buatlah sebuah _package_ bernama `controller` yang berisi sebuah node dengan tujuan mendapatkan input joystick XBox dan mengirimkan perintah pergerakan `x`, `y`, `depth`, dan `yaw`. Namun kalian juga dibebaskan untuk menambahkan perintah-perintah yang lain. Perintah ini akan dikirmkan ke topic bernama `/cmd_vel`.
 
 Untuk mendapat input dari joystick XBox, kalian dapat menggunakan package [joy](http://wiki.ros.org/joy).
 
