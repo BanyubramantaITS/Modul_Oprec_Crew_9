@@ -10,6 +10,8 @@
 - [YOLO](#yolo)
   - [Convolutional Neural Network (CNN)](#convolutional-neural-network-cnn)
   - [Pengenalan YOLO](#pengenalan-yolo)
+    - [Two-Stage Detector](#two-stage-detector)
+    - [One-Stage Detector](#one-stage-detector)
   - [Instalasi](#instalasi-1)
   - [Konsep](#konsep-1)
   - [Pembuatan Dataset dengan Roboflow \& Training](#pembuatan-dataset-dengan-roboflow--training)
@@ -151,7 +153,7 @@ CNN merupakan sebuah algoritma _deep learning_ yang bertujuan untuk mempelajari 
 
 **Neuron** merupakan sebuah fungsi yang memiliki berbagai input dan mengeluarkan suatu output.
 
-**Weights dan bias** merupakan parameter (seperti koefisien dan konstanta) dalam setiap neuron. Parameter ini lah yang akan berubah
+**Weights dan bias** merupakan parameter (seperti koefisien dan konstanta) dalam setiap neuron. Parameter ini lah yang akan berubah dan "belajar".
 
 **Layer** merupakan sekumpulan neuron yang melakukan suatu operasi yang sama.
 
@@ -165,7 +167,7 @@ Layer ini melakukan proses konvolusi pada input yang diberikan. Konvolusi merupa
 
 ### Pooling Layer
 
-Pooling layer bertujuan untuk mereduksi data spatial yang akan dikeluarkan dengan menggunakan kernel. Terdapat berbagai cara untuk melakukan hal tersebut, seperti mengambil nilai terbesar (Max pooling) dan mengambil rata-rata (Average pooling).
+Pooling layer bertujuan untuk mereduksi ukuran data yang akan dikeluarkan dan mengurangi biaya komputasi dengan menggunakan kernel. Terdapat berbagai cara untuk melakukan hal tersebut, seperti mengambil nilai terbesar (Max pooling) dan mengambil rata-rata (Average pooling).
 
 <div align="center">
 <img alt="Pooling Layer" src="https://www.educative.io/api/edpresso/shot/6600568793989120/image/5613117829021696" />
@@ -192,6 +194,24 @@ Fungsi aktifasi menentukan transformasi akhir keluaran sebuah neuron.
 Penjelasan lebih lanjut dan visualisasi CNN dapat dilihat di [visualizer ini](https://poloclub.github.io/cnn-explainer/)
 
 ## Pengenalan YOLO
+
+<div align="center">
+<img src="https://www.researchgate.net/publication/342140262/figure/fig7/AS:941767666958359@1601546317595/The-milestones-of-object-detection-evolution-in-which-AlexNet-116-serves-as-a.png">
+</div>
+
+### Two-Stage Detector
+
+Dalam Two-Stage Detector, proses prediksi terdiri dari 2 fase, yakni:
+1. _Region Proposal Network_ membuat sebuah proposisi yang menentukan lokasi berpotensi objek dalam gambar
+2. Proposisi tersebut dimasukkan ke dalam sebuah _classifier_ atau _regressor_ yang akan menyempurnakan _bounding box_
+
+Contoh dari Two-Stage Detector adalah R-CNN, Fast R-CNN, Faster R-CNN.
+
+### One-Stage Detector
+
+Dalam One-Stage Detector, proses prediksi dilaksanakan secara langsung, dimana gambar langsung diprediksi tanpa adanya pembuatan proposisi. 
+
+Contoh dari One-Stage Detector adalah SSD (Single Shot Multibox Detector), RetinaNet dan YOLO (You Only Look Once)
 
 ## Instalasi
 
@@ -316,3 +336,5 @@ Terdapat banyak cara untuk membuka dan membaca file model YOLO kita, seperti men
 - OpenVINO menyediakan hardware support Intel bagi berbagai macam AI
 - Mini PC kita menggunakan hardware Intel
 - Intel supremacy
+
+## Tugas
