@@ -172,7 +172,7 @@ ros2 pkg create pubsub --build-type ament_cmake --dependencies rclcpp std_msgs -
 Setelah menjalankan perintah tersebut, sebuah folder bernama `pubsub` akan muncul. Folder tersebut juga berisi
 
 ```
-pubsub
+pubsub/
 | src/
 | LICENSE
 | CMakeLists.txt
