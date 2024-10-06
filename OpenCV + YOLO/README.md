@@ -245,7 +245,11 @@ pip install ultralytics
 
 **Penggunaan v5**
 
-**Penggunaan v8**
+YOLOv5 merupakan versi YOLO yang cukup tua namun masih populer hingga saat ini karena akurasinya yang tinggi dengan inferensi yang cepat. Biasanya model ini digunakan dalam aplikasi realtime.
+
+**Penggunan v8**
+
+YOLOv8 merupakan versi YOLO lebih baru lagi yang memiliki akurasi yang lebih tinggi serta fungsi-fungsi yang disediakan selain object detection, seperti instance segmentation dan pose estimation. Biasanya YOLOv8 digunakan apabila tujuan model bukan merupakan object detection atau akurasi lebih penting dibanding kecepatan.
 
 ## Pembuatan Dataset dengan Roboflow & Training
 
