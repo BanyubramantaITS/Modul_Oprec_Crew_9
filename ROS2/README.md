@@ -65,7 +65,7 @@ Setelah itu, install ROS 2 Humble.
 ```shell
 sudo apt update
 sudo apt upgrade
-sudo apt install ros-$ROS_DISTRO-desktop
+sudo apt install ros-humble-desktop
 ```
 
 Dan lakukan setup ROS 2 Humble.
