@@ -192,7 +192,7 @@ Tambahkan file-file berikut ke dalam folder `pubsub/src`:
 #include "rclcpp/rclcpp.hpp"
 #include "std_msgs/msg/string.hpp"
 
-using std::chrono_literals;
+using namespace std::chrono_literals;
 
 class Publisher : public rclcpp::Node
 {
@@ -240,7 +240,7 @@ int main(int argc, char **argv)
 #include "std_msgs/msg/string.hpp"
 
 using namespace std::chrono_literals;
-using std::placeholders::_1;
+using namespace std::placeholders;
 
 class Subscriber : public rclcpp::Node
 {
@@ -248,16 +248,16 @@ class Subscriber : public rclcpp::Node
 
     void topic_callback(const std_msgs::msg::String::SharedPtr msg)
     {
-        RCLCPP_INFO(this->get_logger(), msg.data.c_str());
+        RCLCPP_INFO(this->get_logger(), msg->data.c_str());
     }
 
     public:
-        Subscriber() : Node("node")
+        Subscriber() : Node("sub")
         {
             sub_ = this->create_subscription<std_msgs::msg::String>(
                 "topic",
                 10,
-                std::bind(&Subcriber::topic_callback, this, _1)
+                std::bind(&Subscriber::topic_callback, this, _1)
             );
         }
 };
@@ -338,7 +338,7 @@ Lakukan _build_.
 colcon build
 ```
 
-Dan source installasi.
+Dan source instalasi.
 
 ```shell
 . install/setup.bash
@@ -371,11 +371,11 @@ int main(int argc, char **argv)
 {
     rclcpp::init(argc, argv);
 
-    std::shared_ptr<rclcpp::Node> server = std::make_shared<rclcpp::Node>("add_server");
+    std::shared_ptr<rclcpp::Node> node = std::make_shared<rclcpp::Node>("add_server");
 
-    rclcpp::Service<interfaces::srv::Add>::SharedPtr adder = node->create_service<interfaces::srv::Add>("add", &add);
+    rclcpp::Service<interfaces::srv::Add>::SharedPtr server = node->create_service<interfaces::srv::Add>("add", &add);
 
-    rclcpp::spin(server);
+    rclcpp::spin(node);
     rclcpp::shutdown();
 
     return 0;
@@ -391,18 +391,20 @@ int main(int argc, char **argv)
 #include "rclcpp/rclcpp.hpp"
 #include "interfaces/srv/add.hpp"
 
+using namespace std::chrono_literals;
+
 int main(int argc, char **argv)
 {
     rclcpp::init(argc, argv);
 
-    std::shared_ptr<rclcpp::Node> node = std::make_shared<rclcpp::Node>("client");
+    std::shared_ptr<rclcpp::Node> node = std::make_shared<rclcpp::Node>("add_client");
     rclcpp::Client<interfaces::srv::Add>::SharedPtr client = node->create_client<interfaces::srv::Add>("add");
 
     auto req = std::make_shared<interfaces::srv::Add::Request>();
     req->a = atoi(argv[1]);
     req->b = atoi(argv[2]);
 
-    while (client->wait_for_service(1s))
+    while (!client->wait_for_service(1s))
     {
         if (!rclcpp::ok())
         {
@@ -416,7 +418,7 @@ int main(int argc, char **argv)
     auto res = client->async_send_request(req);
 
     if (rclcpp::spin_until_future_complete(node, res) == rclcpp::FutureReturnCode::SUCCESS)
-        RCLCPP_INFO(node->get_logger(), "Sum: %d", res->sum);
+        RCLCPP_INFO(node->get_logger(), "Sum: %d", res.get()->sum);
     else
         RCLCPP_ERROR(node->get_logger(), "Failed to call service");
 
@@ -441,7 +443,21 @@ install(
 )
 ```
 
-Jalan perintah berikut dalam 
+Setelah itu, _build_ _package_ tersebut:
+```shell
+colcon build
+```
+
+Dan lakukan _sourcing_:
+```shell
+. install/setup.bash
+```
+
+Jalan perintah berikut dalam terminal:
+```shell
+ros2 run calculator server # Di satu terminal
+ros2 run calculator client 2 3 # Di terminal lain
+```
 
 ### Action
 
@@ -455,14 +471,23 @@ int32[] sequence
 int32[] partial_sequence
 ```
 
+Dan tambahkan file tersebut ke dalam `CMakeLists.txt` milik `interfaces`
+```cmake
+rosidl_generate_interfaces(${PROJECT_NAME}
+    "srv/Add.srv"
+    "action/Fibonacci.action" # Tambahkan ini
+    DEPENDENCIES std_msgs
+)
+```
+
 Buatlah sebuah _package_ baru bernama `fibonnaci` dengan menjalankan perintah berikut:
 ```shell
-ros2 pkg create fibonnaci --build-type ament_cmake --dependencies rclcpp rclcpp_action rclcpp_components interfaces --license Apache2.0
+ros2 pkg create fibonacci --build-type ament_cmake --dependencies rclcpp rclcpp_action rclcpp_components interfaces --license Apache-2.0
 ```
 
 Setelah itu, tambahkan file-file berikut:
 
-`include/fibonnaci/visibility_control.h`
+`include/fibonacci/visibility_control.h`
 ```cpp
 #ifndef ACTION_TUTORIALS_CPP__VISIBILITY_CONTROL_H_
 #define ACTION_TUTORIALS_CPP__VISIBILITY_CONTROL_H_
@@ -514,19 +539,19 @@ extern "C"
 #include <memory>
 #include <thread>
 
-#include "interfaces/action/fibonacci.hpp"
 #include "rclcpp/rclcpp.hpp"
 #include "rclcpp_action/rclcpp_action.hpp"
 #include "rclcpp_components/register_node_macro.hpp"
+#include "interfaces/action/fibonacci.hpp"
 
-#include "action_tutorials_cpp/visibility_control.h"
+#include "fibonacci/visibility_control.h"
 
 namespace action_tutorials_cpp
 {
 class FibonacciActionServer : public rclcpp::Node
 {
 public:
-  using Fibonacci = action_tutorials_interfaces::action::Fibonacci;
+  using Fibonacci = interfaces::action::Fibonacci;
   using GoalHandleFibonacci = rclcpp_action::ServerGoalHandle<Fibonacci>;
 
   ACTION_TUTORIALS_CPP_PUBLIC
@@ -628,7 +653,7 @@ namespace action_tutorials_cpp
 class FibonacciActionClient : public rclcpp::Node
 {
 public:
-  using Fibonacci = action_tutorials_interfaces::action::Fibonacci;
+  using Fibonacci = interfaces::action::Fibonacci;
   using GoalHandleFibonacci = rclcpp_action::ClientGoalHandle<Fibonacci>;
 
   explicit FibonacciActionClient(const rclcpp::NodeOptions & options)
@@ -728,7 +753,7 @@ Lalu tambahkan ini dalam `CMakeLists.txt`
 
 ```cmake
 add_library(action_server SHARED
-  src/fibonacci_action_server.cpp)
+  src/server.cpp)
 target_include_directories(action_server PRIVATE
   $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include>
   $<INSTALL_INTERFACE:include>)
@@ -739,7 +764,7 @@ ament_target_dependencies(action_server
   "rclcpp"
   "rclcpp_action"
   "rclcpp_components")
-rclcpp_components_register_node(action_server PLUGIN "action_tutorials_cpp::FibonacciActionServer" EXECUTABLE fibonacci_action_server)
+rclcpp_components_register_node(action_server PLUGIN "action_tutorials_cpp::FibonacciActionServer" EXECUTABLE server)
 install(TARGETS
   action_server
   ARCHIVE DESTINATION lib
@@ -754,11 +779,11 @@ target_include_directories(action_client PRIVATE
 target_compile_definitions(action_client
   PRIVATE "ACTION_TUTORIALS_CPP_BUILDING_DLL")
 ament_target_dependencies(action_client
-  "action_tutorials_interfaces"
+  "interfaces"
   "rclcpp"
   "rclcpp_action"
   "rclcpp_components")
-rclcpp_components_register_node(action_client PLUGIN "action_tutorials_cpp::FibonacciActionClient" EXECUTABLE fibonacci_action_client)
+rclcpp_components_register_node(action_client PLUGIN "action_tutorials_cpp::FibonacciActionClient" EXECUTABLE client)
 install(TARGETS
   action_client
   ARCHIVE DESTINATION lib
@@ -769,6 +794,11 @@ install(TARGETS
 Lalu jalankan perintah ini di direktori workspace:
 ```shell
 colcon build
+```
+
+Dan lakukan sourcing
+```shell
+. install/setup.bash
 ```
 
 Setelah proses _build_ selesai, jalankan:
