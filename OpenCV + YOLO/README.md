@@ -6,6 +6,7 @@
     - [Dasar OpenCV](#dasar-opencv)
     - [Color Spaces](#color-spaces)
     - [Color Detection](#color-detection)
+  - [Compile Code](#compile-code)
     - [Operasi Basic](#operasi-basic)
     - [Operasi Aritmetik](#operasi-aritmetik)
 - [YOLO](#yolo)
@@ -165,6 +166,14 @@ inRange(brightHSV, minHSV, maxHSV, maskHSV);
 bitwise_and(brightHSV, brightHSV, resultHSV, maskHSV);
 
 imshow("Result HSV", resultHSV)
+```
+
+## Compile Code
+
+C++
+
+```
+g++ <file> -o main `pkg-config --cflags --libs opencv4`
 ```
 
 ### Operasi Basic
