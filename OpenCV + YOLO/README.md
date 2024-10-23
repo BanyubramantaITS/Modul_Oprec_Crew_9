@@ -4,6 +4,7 @@
   - [Instalasi](#instalasi)
   - [Konsep](#konsep)
     - [Dasar OpenCV](#dasar-opencv)
+    - [Video di OpenCV](#video-di-opencv)
     - [Color Spaces](#color-spaces)
     - [Color Detection](#color-detection)
   - [Compile Code](#compile-code)
@@ -101,6 +102,24 @@ waitKey(0); // wait for a keystroke
 destroyAllWindows(); // Destroys all the windows created
 
 imwrite("grayscale.jpg", img_grayscale); // write
+```
+
+### Video di OpenCV
+
+Kita bisa memakai VideoCapture() untuk melakukan pengambilan frame dari video/camera.
+
+```c++
+cap = cv::VideoCapture(0);
+while (cap.isOpened()) {
+	cv::Mat frame;
+
+	if (!cap.read(frame))
+		break;
+	cv::imshow("frame", frame);
+
+  if (cv::waitKey(30) == 'q')
+    break;
+}
 ```
 
 ### Color Spaces
