@@ -5,10 +5,17 @@
   - [Konsep](#konsep)
     - [Dasar OpenCV](#dasar-opencv)
     - [Color Spaces](#color-spaces)
+    - [Color Detection](#color-detection)
     - [Operasi Basic](#operasi-basic)
     - [Operasi Aritmetik](#operasi-aritmetik)
 - [YOLO](#yolo)
   - [Convolutional Neural Network (CNN)](#convolutional-neural-network-cnn)
+    - [Basics](#basics)
+    - [Convolutional Layer](#convolutional-layer)
+    - [Pooling Layer](#pooling-layer)
+    - [Fully Connected Layer](#fully-connected-layer)
+    - [Activation](#activation)
+    - [Visualizer](#visualizer)
   - [Pengenalan YOLO](#pengenalan-yolo)
     - [Two-Stage Detector](#two-stage-detector)
     - [One-Stage Detector](#one-stage-detector)
@@ -16,7 +23,7 @@
   - [Konsep](#konsep-1)
   - [Pembuatan Dataset dengan Roboflow \& Training](#pembuatan-dataset-dengan-roboflow--training)
   - [Integrasi dengan ROS2](#integrasi-dengan-ros2)
-  - [YOLO di C++](#yolo-di-c)
+  - [Tugas](#tugas)
 
 # OpenCV
 
@@ -132,6 +139,33 @@ Berbeda dengan Color space lainnya, HSV hanya menggunakan satu _channel_ (Hue) u
 </div>
 
 Grayscale memperhitungkan semua aspek gambar dalam satu channel. Biasanya color space ini digunakan apabila tujuan pemrosesan gambar tidak memperhitungkan warna.
+
+Untuk melakukan perubahan dalam color space sebuah gambar di OpenCV, dapat dilakukan melalui:
+
+```c++
+cvtColor(inputFile, outputFile, colorSpace)
+```
+
+### Color Detection
+
+Dalam melakukan deteksi warna di image, biasanya color space yang digunakan yaitu HSV. Berikut adalah contoh program untuk deteksi warna sekita hue 150: 
+
+```c++
+Mat framehsv; 
+cvtColor(frame, framehsv, COLOR_BGR2HSV); 
+
+int hue = 150;
+int thresh = 40;
+
+Scalar minHSV = cv::Scalar(hue - thresh, hue - thresh, hue - thresh)
+Scalar maxHSV = cv::Scalar(hue + thresh, hue + thresh, hue + thresh)
+
+Mat maskHSV, resultHSV;
+inRange(brightHSV, minHSV, maxHSV, maskHSV);
+bitwise_and(brightHSV, brightHSV, resultHSV, maskHSV);
+
+imshow("Result HSV", resultHSV)
+```
 
 ### Operasi Basic
 
