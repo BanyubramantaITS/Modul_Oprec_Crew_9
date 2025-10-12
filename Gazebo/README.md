@@ -23,50 +23,48 @@ Gazebo adalah aplikasi simulasi realistis khusus untuk simulasi robot. Gazebo me
 
 ## Instalasi
 
-Gazebo memiliki 3 versi, yaitu:
+Gazebo sebenarnya memiliki beberapa generasi versi yang pernah digunakan dalam pengembangan robotika. Namun tidak semua versi masih aktif digunakan sekarang.
 
 ### Gazebo Classic
 
-Gazebo Classic merupakan versi Gazebo tertua dan sudah mendekati EOL. Meski begitu, integrasinya dengan ROS (khususnya ROS 1) tidak dapat dipungkiri.
-
-Untuk melakukan instalasi, kalian dapat install Debian package di [website Gazebo Classic](https://classic.gazebosim.org/).
+Gazebo Classic adalah versi tertua dari Gazebo yang dikembangkan sejak era ROS 1.
+Versi ini menggunakan fisika dasar dan antarmuka lama.
 
 ### Gazebo Ignition
 
-Gazebo Ignition bisa dikatakan seperti middle child dalam keluarga Gazebo ini. Gazebo Ignition awalnya berupa versi baru dari Gazebo Classic dengan _physics engine_ lebih baik, sensor dan plugin lebih banyak, dan integrasi dengan ROS 2. Namun setelah Gazebo Sim 6, nama Gazebo Ignition diubah menjadi Gazebo Sim.
-
-Untuk melakukan instalasi versi terbaru Gazebo Ignition, kalian dapat jalankan:
-
-```shell
-sudo apt-get update
-sudo apt-get install lsb-release gnupg
-sudo curl https://packages.osrfoundation.org/gazebo.gpg --output /usr/share/keyrings/pkgs-osrf-archive-keyring.gpg
-echo "deb [arch=$(dpkg --print-architecture) signed-by=/usr/share/keyrings/pkgs-osrf-archive-keyring.gpg] http://packages.osrfoundation.org/gazebo/ubuntu-stable $(lsb_release -cs) main" | sudo tee /etc/apt/sources.list.d/gazebo-stable.list > /dev/null
-sudo apt-get update
-sudo apt-get install ignition-fortress
-```
-
-Untuk memastikan apabila Gazebo Ignition telah terinstalasi, kalian dapat menjalankan:
-
-```shell
-ign gazebo
-```
+Gazebo Ignition merupakan penerus dari Gazebo Classic dengan peningkatan besar pada engine fisika, rendering, dan sistem plugin.
+Nama “Ignition” sendiri kini tidak lagi digunakan, setelah versi ke-6, proyek ini berganti nama resmi menjadi Gazebo Sim.
 
 ### Gazebo Sim
 
-Gazebo Sim merupakan versi Gazebo terbaru. Gazebo Sim menyediakan lebih banyak sensor dan kapabilitas untuk simulasi skala besar seperti simulasi robot beregu.
+Gazebo Sim adalah generasi terbaru dari simulator Gazebo.
+Rilis ini membawa dukungan skala besar, sensor baru, serta integrasi penuh dengan ROS 2.
+Versi modern Gazebo menggunakan sistem rilis bernama huruf, seperti:
 
-Untuk melakukan instalasi pada Gazebo Sim, jalankan perintah berikut:
+- Fortress (LTS) – stabil untuk ROS 2 Humble
+- Harmonic (LTS) – untuk ROS 2 Jazzy
+- Jetty (LTS terbaru) – untuk Ubuntu 24.04 dan ROS 2 Rolling/Jazzy+
 
-```shell
+### Gazebo Fortress 
+Versi-versi lama di atas sudah tidak kita gunakan lagi dan tidak perlu diperhatikan. Saat ini kita hanya menggunakan Gazebo Fortress saja.
+Kenapa kita menggunakan versi Gazebo ini? Alasannya sederhana, karena integrasi ROS 2 Humble dengan Gazebo Fortress adalah yang paling stabil dan resmi direkomendasikan oleh developer ROS dan Gazebo.
+
+#### Instalasi Gazebo Fortress
+Instalasi dapat kalian lihat di [dokumentasi gazebo fortress](https://gazebosim.org/docs/fortress/install_ubuntu/)
+
+Pertama kalian perlu menginstall tools yang diperlukan
+```
 sudo apt-get update
-sudo apt-get install lsb-release curl gnupg
-sudo curl https://packages.osrfoundation.org/gazebo.gpg --output /usr/share/keyrings/pkgs-osrf-archive-keyring.gpg
-echo "deb [arch=$(dpkg --print-architecture) signed-by=/usr/share/keyrings/pkgs-osrf-archive-keyring.gpg] http://packages.osrfoundation.org/gazebo/ubuntu-stable $(lsb_release -cs) main" | sudo tee /etc/apt/sources.list.d/gazebo-stable.list > /dev/null
-sudo apt-get update
-sudo apt-get install gz-garden
+sudo apt-get install lsb-release gnupg
 ```
 
+Selanjutnya, install Gazebo Fortress
+```
+sudo curl https://packages.osrfoundation.org/gazebo.gpg --output /usr/share/keyrings/pkgs-osrf-archive-keyring.gpg
+echo "deb [arch=$(dpkg --print-architecture) signed-by=/usr/share/keyrings/pkgs-osrf-archive-keyring.gpg] https://packages.osrfoundation.org/gazebo/ubuntu-stable $(lsb_release -cs) main" | sudo tee /etc/apt/sources.list.d/gazebo-stable.list > /dev/null
+sudo apt-get update
+sudo apt-get install ignition-fortress
+```
 ## Konsep
 
 Dalam Gazebo, terdapat berbagai konsep yang perlu dipahami untuk membuat simulasi. Berikut konsep-konsep tersebut.
