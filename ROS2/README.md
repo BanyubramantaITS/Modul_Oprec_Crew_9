@@ -20,14 +20,14 @@
 ROS merupakan sebuah _framework_ yang dirancang khusus untuk membuat aplikasi robot. ROS memiliki banyak driver, algoritma, dan alat-alat lainnya yang dapat membantu _developer_ untuk membuat robot dengan _robust_. Tak hanya itu, ROS bersifat _open source_, sehingga selain adanya transparansi untuk para _developer_, ROS juga **gratis**.
 
 <div align="center">
-<img alt="ketika ada yang gratis" src="https://th.bing.com/th/id/OIP.gC_D-cCr9EsmXnc7XTNU4QAAAA?rs=1&pid=ImgDetMain" />
+<img alt="ketika ada yang gratis" src="https://i.pinimg.com/736x/43/80/a9/4380a970395e73e9b6de7cf17dd39553.jpg"/>
 </div>
 
 ## Instalasi
 
-Untuk contoh ini, kita akan melakukan instalasi ROS 2 distribusi Humble dalam sistem operasi Ubuntu / Lubuntu / Kubuntu / Xubuntu (pokoknya jangan Uwubuntu ataupun Winbuntu ataupun distro aneh2 lain) 22.04.
+Untuk contoh ini, kita akan melakukan instalasi ROS 2 distribusi Humble dalam sistem operasi Ubuntu / Lubuntu / Kubuntu / Xubuntu  22.04.
 
-Pada awalnya, pastikan locale kalian mensupport UTF-8. Apabila tidak, masukkan perintah-perintah berikut ke terminal.
+Pada awalnya, pastikan locale kalian mensupport UTF-8. Apabila tidak, masukkan perintah-perintah berikut untuk set locale ke terminal.
 
 ```shell
 locale  # check for UTF-8
@@ -47,17 +47,18 @@ sudo apt install software-properties-common
 sudo add-apt-repository universe
 ```
 
-Tambahkan GPG key ROS 2.
+Instalasi `ros-apt-source`
+
+Menginstal paket `ros2-apt-source` akan mengkonfigurasi repository ROS 2. Pembaruan pada konfigurasi repository akan terjadi secara otomatis ketika versi baru dari paket ini dirilis ke repository ROS.
 
 ```shell
 sudo apt update && sudo apt install curl -y
-sudo curl -sSL https://raw.githubusercontent.com/ros/rosdistro/master/ros.key -o /usr/share/keyrings/ros-archive-keyring.gpg
-```
 
-Dan tambahkan repository ke _source list_.
+export ROS_APT_SOURCE_VERSION=$(curl -s https://api.github.com/repos/ros-infrastructure/ros-apt-source/releases/latest | grep -F "tag_name" | awk -F\" '{print $4}')
 
-```shell
-echo "deb [arch=$(dpkg --print-architecture) signed-by=/usr/share/keyrings/ros-archive-keyring.gpg] http://packages.ros.org/ros2/ubuntu $(. /etc/os-release && echo $UBUNTU_CODENAME) main" | sudo tee /etc/apt/sources.list.d/ros2.list > /dev/null
+curl -L -o /tmp/ros2-apt-source.deb "https://github.com/ros-infrastructure/ros-apt-source/releases/download/${ROS_APT_SOURCE_VERSION}/ros2-apt-source_${ROS_APT_SOURCE_VERSION}.$(. /etc/os-release && echo ${UBUNTU_CODENAME:-${VERSION_CODENAME}})_all.deb"
+
+sudo dpkg -i /tmp/ros2-apt-source.deb
 ```
 
 Setelah itu, install ROS 2 Humble.
