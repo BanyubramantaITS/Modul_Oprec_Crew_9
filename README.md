@@ -1,6 +1,6 @@
 # Welcome!
 
-Selamat datang para calon-calon Crew 8 Banyubramanta, ini adalah modul Open Recruitment untuk mempersiapkan kalian terhadap tugas-tugas di Banyubramanta nantinya. Selamat belajar!
+Selamat datang para calon-calon Crew 9 Banyubramanta, ini adalah modul Open Recruitment untuk mempersiapkan kalian terhadap tugas-tugas di Banyubramanta nantinya. Selamat belajar!
 
 ## Learning Tree
 
