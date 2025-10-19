@@ -2,20 +2,33 @@
 
 ## Daftar Isi
 
--   [Definisi](#definisi)
--   [Instalasi](#instalasi)
-    -   [Gazebo Classic](#gazebo-classic)
-    -   [Gazebo Ignition](#gazebo-ignition)
-    -   [Gazebo Sim](#gazebo-sim)
--   [Konsep](#konsep)
-    -   [World](#world)
-    -   [Model](#model)
-    -   [Link](#link)
-    -   [Joint](#joint)
-    -   [Plugin](#plugin)
--   [Praktik](#praktik)
-    -   [Link](#link-1)
-    -   [Macros](#macros)
+- [Gazebo](#gazebo)
+  - [Daftar Isi](#daftar-isi)
+  - [Definisi](#definisi)
+  - [Instalasi](#instalasi)
+    - [Gazebo Classic](#gazebo-classic)
+    - [Gazebo Ignition](#gazebo-ignition)
+    - [Gazebo Sim](#gazebo-sim)
+    - [Gazebo Fortress](#gazebo-fortress)
+      - [Instalasi Gazebo Fortress](#instalasi-gazebo-fortress)
+  - [Konsep](#konsep)
+    - [World](#world)
+    - [Model](#model)
+    - [Link](#link)
+    - [Joint](#joint)
+    - [Plugin](#plugin)
+    - [Format Deskripsi](#format-deskripsi)
+      - [SDF](#sdf)
+      - [URDF](#urdf)
+      - [Xacro](#xacro)
+  - [Praktik](#praktik)
+    - [Link](#link-1)
+    - [Macros](#macros)
+    - [Sensor](#sensor)
+    - [Control](#control)
+    - [Launch](#launch)
+  - [Tugas](#tugas)
+  - [Referensi](#referensi)
 
 ## Definisi
 
@@ -23,21 +36,22 @@ Gazebo adalah aplikasi simulasi realistis khusus untuk simulasi robot. Gazebo me
 
 ## Instalasi
 
-Gazebo sebenarnya memiliki beberapa generasi versi yang pernah digunakan dalam pengembangan robotika. Namun tidak semua versi masih aktif digunakan sekarang.
+Gazebo sebenarnya memiliki [beberapa versi](https://gazebosim.org/about ) yang pernah digunakan dalam pengembangan robotika. Namun tidak semua versi masih aktif digunakan sekarang.
+
+![alt text](../assets/timeline.svg)
 
 ### Gazebo Classic
 
 Gazebo Classic adalah versi tertua dari Gazebo yang dikembangkan sejak era ROS 1.
-Versi ini menggunakan fisika dasar dan antarmuka lama.
+Versi ini menggunakan fisika dasar dan interface lama.
 
 ### Gazebo Ignition
 
 Gazebo Ignition merupakan penerus dari Gazebo Classic dengan peningkatan besar pada engine fisika, rendering, dan sistem plugin.
-Nama “Ignition” sendiri kini tidak lagi digunakan, setelah versi ke-6, proyek ini berganti nama resmi menjadi Gazebo Sim.
 
 ### Gazebo Sim
 
-Gazebo Sim adalah generasi terbaru dari simulator Gazebo.
+Gazebo Sim adalah generasi terbaru dari simulator Gazebo. Versi ini merupakan *rebranding* dari Gazebo Ignition
 Rilis ini membawa dukungan skala besar, sensor baru, serta integrasi penuh dengan ROS 2.
 Versi modern Gazebo menggunakan sistem rilis bernama huruf, seperti:
 
@@ -45,26 +59,19 @@ Versi modern Gazebo menggunakan sistem rilis bernama huruf, seperti:
 - Harmonic (LTS) – untuk ROS 2 Jazzy
 - Jetty (LTS terbaru) – untuk Ubuntu 24.04 dan ROS 2 Rolling/Jazzy+
 
-### Gazebo Fortress 
+### Gazebo Fortress
 Versi-versi lama di atas sudah tidak kita gunakan lagi dan tidak perlu diperhatikan. Saat ini kita hanya menggunakan Gazebo Fortress saja.
 Kenapa kita menggunakan versi Gazebo ini? Alasannya sederhana, karena integrasi ROS 2 Humble dengan Gazebo Fortress adalah yang paling stabil dan resmi direkomendasikan oleh developer ROS dan Gazebo.
 
 #### Instalasi Gazebo Fortress
-Instalasi dapat kalian lihat di [dokumentasi gazebo fortress](https://gazebosim.org/docs/fortress/install_ubuntu/)
+Instalasi dapat kalian lihat di [dokumentasi gazebo fortress](https://gazebosim.org/docs/all/ros_installation/)
 
-Pertama kalian perlu menginstall tools yang diperlukan
+Kita bisa menginstall Gazebo Fortress dengan command ini
 ```
-sudo apt-get update
-sudo apt-get install lsb-release gnupg
+sudo apt update
+sudo apt install ros-humble-ros-gz-sim
 ```
 
-Selanjutnya, install Gazebo Fortress
-```
-sudo curl https://packages.osrfoundation.org/gazebo.gpg --output /usr/share/keyrings/pkgs-osrf-archive-keyring.gpg
-echo "deb [arch=$(dpkg --print-architecture) signed-by=/usr/share/keyrings/pkgs-osrf-archive-keyring.gpg] https://packages.osrfoundation.org/gazebo/ubuntu-stable $(lsb_release -cs) main" | sudo tee /etc/apt/sources.list.d/gazebo-stable.list > /dev/null
-sudo apt-get update
-sudo apt-get install ignition-fortress
-```
 ## Konsep
 
 Dalam Gazebo, terdapat berbagai konsep yang perlu dipahami untuk membuat simulasi. Berikut konsep-konsep tersebut.
@@ -535,7 +542,7 @@ def generate_launch_description():
 
 	pkg_path = os.path.join(get_package_share_directory('sim'))
     xacro_file = os.path.join(pkg_path,'description','robot.xacro')
-    
+
 	robot_description_config = Command(['xacro ', xacro_file])
 
     rsp = Node(
@@ -549,7 +556,7 @@ def generate_launch_description():
                         arguments=['-topic', 'robot_description',
                                    '-entity', 'robot'],
                         output='screen')
-	
+
 	gazebo = IncludeLaunchDescription(
                 PythonLaunchDescriptionSource([os.path.join(
                     get_package_share_directory('gazebo_ros'), 'launch', 'gazebo.launch.py')]),
@@ -584,17 +591,17 @@ add_library(
   controller SHARED
   src/controller.cpp
 )
-ament_target_dependencies(controller 
-  rclcpp 
-  geometry_msgs 
-  nav_msgs 
-  sensor_msgs 
-  gazebo_dev 
-  gazebo_msgs 
-  gazebo_plugins 
-  gazebo_ros 
-  gazebo_ros_pkgs 
-  tf2 
+ament_target_dependencies(controller
+  rclcpp
+  geometry_msgs
+  nav_msgs
+  sensor_msgs
+  gazebo_dev
+  gazebo_msgs
+  gazebo_plugins
+  gazebo_ros
+  gazebo_ros_pkgs
+  tf2
   tf2_geometry_msgs
   tf2_ros)
 
