@@ -2,18 +2,23 @@
 
 ## Daftar Isi
 
-- [Definisi](#definisi)
-- [Instalasi](#instalasi)
-- [Konsep](#konsep)
-  - [Topic](#topic)
-  - [Service](#service)
-  - [Action](#action)
-  - [Interfaces](#interfaces)
-- [Praktik](#implementasi)
-  - [Setup Workspace](#setup-workspace)
-  - [Topic](#topic-1)
-  - [Service](#service-1)
-  - [Action](#action-1)
+- [ROS 2](#ros-2)
+  - [Daftar Isi](#daftar-isi)
+  - [Definisi](#definisi)
+  - [Instalasi](#instalasi)
+  - [Konsep](#konsep)
+    - [Node](#node)
+    - [Topic](#topic)
+    - [Service](#service)
+    - [Action](#action)
+    - [Interfaces](#interfaces)
+  - [Implementasi](#implementasi)
+    - [Setup Workspace](#setup-workspace)
+    - [Topic](#topic-1)
+    - [Service](#service-1)
+    - [Action](#action-1)
+  - [Tugas](#tugas)
+  - [Referensi](#referensi)
 
 ## Definisi
 
@@ -817,3 +822,4 @@ Untuk mendapat input dari joystick XBox, kalian dapat menggunakan package [joy](
 ## Referensi
 
 https://docs.ros.org/en/humble/Tutorials/Beginner-CLI-Tools.html
+https://github.com/Grydr/ros2-ws-tutorial

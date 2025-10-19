@@ -136,7 +136,7 @@ source ~/.bashrc
 
 # Terminal Emulators
 
-Sebenarnya ada banyak terminal emulator yang bisa kalian pakai, tetapi untuk di mini PC Banyu nanti pakai **Terminator** karena dia paling ringan diantara emulator yang lain, dan tidak menggunakan GPU. Terminal emulator sendiri kita gunakan untuk bisa membuka banyak terminal dalam satu session/window, sehingga lebih mudah untuk melihat output program yang dijalankan secara simultaneous. 
+Sebenarnya ada banyak terminal emulator yang bisa kalian pakai, tetapi untuk di mini PC Banyu nanti pakai **Terminator** karena dia paling ringan diantara emulator yang lain, dan tidak menggunakan GPU. Terminal emulator sendiri kita gunakan untuk bisa membuka banyak terminal dalam satu session/window, sehingga lebih mudah untuk melihat output program yang dijalankan secara simultaneous.
 
 Berikut beberapa contoh terminal emulator beserta kelebihan/kelemahannya:
 
@@ -147,4 +147,4 @@ Berikut beberapa contoh terminal emulator beserta kelebihan/kelemahannya:
 | Kitty                      | Penggunaan GPU untuk melakukan rendering, tampilan yang bagus setelah dikonfigurasi.           | Konfigurasi awal yang rumit, dan RAM usage tinggi.   |
 | Alacritty                  | Performa sangat cepat, tampilan yang bagus. (GPU-accerelated, OpenGL)    | Kurangnya dukungan tab native, RAM usage tinggi.    |
 
-Sekarang kalian bisa melanjutkan ke ROS2~
+Sekarang kalian bisa melanjutkan ke [ROS2](/ROS2)
