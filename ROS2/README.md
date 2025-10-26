@@ -80,6 +80,19 @@ Dan lakukan setup ROS 2 Humble.
 source /opt/ros/humble/setup.bash
 ```
 
+Karena command diatas ini harus kita jalankan tiap kali buka terminal baru maka agar memudahkan hidup, mending kita tambahin ke file `.bashrc` nya kita
+```shell
+echo "source /opt/ros/humble/setup.bash" >> ~/.bashrc
+```
+
+Setelah menambahkan command diatas kita bisa restart shellnya dengan cara:
+  - Close & reopen terminalnya, atau
+  - Jalankan command
+    ```shell
+    source ~/.bashrc
+    ```
+
+
 Untuk memastikan ROS 2 Humble sudah terinstalasi, jalankan beberapa program ROS 2 Humble.
 
 ```shell
@@ -169,7 +182,7 @@ Setelah melakukan instalasi `colcon`, kita dapat mulai membuat aplikasi robot :s
 
 ### Topic
 
-Di folder `src`, buatlah sebuah package.
+Di folder `ros2_ws/src`, buatlah sebuah package.
 
 ```shell
 ros2 pkg create pubsub --build-type ament_cmake --dependencies rclcpp std_msgs --license Apache-2.0
@@ -200,80 +213,75 @@ Tambahkan file-file berikut ke dalam folder `pubsub/src`:
 
 using namespace std::chrono_literals;
 
-class Publisher : public rclcpp::Node
+/* This example creates a subclass of Node and uses std::bind() to register a
+* member function as a callback from the timer. */
+
+class MinimalPublisher : public rclcpp::Node
 {
-    rclcpp::TimerBase::SharedPtr timer_;
-    rclcpp::Publisher<std_msgs::msg::String>::SharedPtr pub_;
-
-    void timer_callback()
+  public:
+    MinimalPublisher()
+    : Node("minimal_publisher"), count_(0)
     {
-        auto msg = std_msgs::msg::String();
-        msg.data = "Halo dunia!";
-
-        pub_->publish(msg);
+      publisher_ = this->create_publisher<std_msgs::msg::String>("topic", 10);
+      timer_ = this->create_wall_timer(
+      500ms, std::bind(&MinimalPublisher::timer_callback, this));
     }
 
-    public:
-        Publisher() : Node("pub")
-        {
-            timer_ = this->create_wall_timer(
-                500ms,
-                std::bind(&Publisher::timer_callback, this)
-            );
-
-            pub_ = this->create_publisher<std_msgs::msg::String>("topic", 10);
-        }
+  private:
+    void timer_callback()
+    {
+      auto message = std_msgs::msg::String();
+      message.data = "Hello, world! " + std::to_string(count_++);
+      RCLCPP_INFO(this->get_logger(), "Publishing: '%s'", message.data.c_str());
+      publisher_->publish(message);
+    }
+    rclcpp::TimerBase::SharedPtr timer_;
+    rclcpp::Publisher<std_msgs::msg::String>::SharedPtr publisher_;
+    size_t count_;
 };
 
-int main(int argc, char **argv)
+int main(int argc, char * argv[])
 {
-    rclcpp::init(argc, argv);
-    rclcpp::spin(std::make_shared<Publisher>());
-    rclcpp::shutdown();
-    return 0;
+  rclcpp::init(argc, argv);
+  rclcpp::spin(std::make_shared<MinimalPublisher>());
+  rclcpp::shutdown();
+  return 0;
 }
 ```
 
 `sub.cpp`
 
 ```cpp
-#include <chrono>
-#include <functional>
 #include <memory>
-#include <string>
 
 #include "rclcpp/rclcpp.hpp"
 #include "std_msgs/msg/string.hpp"
+using std::placeholders::_1;
 
-using namespace std::chrono_literals;
-using namespace std::placeholders;
-
-class Subscriber : public rclcpp::Node
+class MinimalSubscriber : public rclcpp::Node
 {
-    rclcpp::Subscription<std_msgs::msg::String>::SharedPtr sub_;
-
-    void topic_callback(const std_msgs::msg::String::SharedPtr msg)
+  public:
+    MinimalSubscriber()
+    : Node("minimal_subscriber")
     {
-        RCLCPP_INFO(this->get_logger(), msg->data.c_str());
+      subscription_ = this->create_subscription<std_msgs::msg::String>(
+      "topic", 10, std::bind(&MinimalSubscriber::topic_callback, this, _1));
     }
 
-    public:
-        Subscriber() : Node("sub")
-        {
-            sub_ = this->create_subscription<std_msgs::msg::String>(
-                "topic",
-                10,
-                std::bind(&Subscriber::topic_callback, this, _1)
-            );
-        }
+  private:
+    void topic_callback(const std_msgs::msg::String & msg) const
+    {
+      RCLCPP_INFO(this->get_logger(), "I heard: '%s'", msg.data.c_str());
+    }
+    rclcpp::Subscription<std_msgs::msg::String>::SharedPtr subscription_;
 };
 
-int main(int argc, char **argv)
+int main(int argc, char * argv[])
 {
-    rclcpp::init(argc, argv);
-    rclcpp::spin(std::make_shared<Subscriber>());
-    rclcpp::shutdown();
-    return 0;
+  rclcpp::init(argc, argv);
+  rclcpp::spin(std::make_shared<MinimalSubscriber>());
+  rclcpp::shutdown();
+  return 0;
 }
 ```
 
@@ -307,13 +315,13 @@ ros2 run pubsub sub # Di terminal lain
 
 ### Service
 
-Buatlah sebuah _package_ baru bernama `interfaces` dalam folder `src`. _Package_ ini akan berisi semua `msg`, `srv`, `action` buatan sendiri.
+Buatlah sebuah _package_ baru bernama `interfaces` dalam folder workspace `ros2_ws/src`. _Package_ ini akan berisi semua `msg`, `srv`, `action` buatan sendiri.
 
 ```shell
 ros2 pkg create interfaces --build-type ament_cmake --dependencies std_msgs rosidl_default_generators --license Apache-2.0
 ```
 
-Dalam `interfaces/src`, buatlah sebuah folder bernama `srv`. Dalam folder tersebut, buatlah sebuah file bernama `Add.srv` yang berisi:
+Dalam `ros2_ws/src/interfaces`, buatlah sebuah folder bernama `srv`. Dalam folder tersebut, lalu buat sebuah file bernama `Add.srv` yang berisi:
 
 ```srv
 int16 a
@@ -325,6 +333,7 @@ int16 sum
 Dalam `package.xml`, tambahkan:
 
 ```xml
+<buildtool_depend>rosidl_default_generators</buildtool_depend>
 <exec_depend>rosidl_default_runtime</exec_depend>
 <member_of_group>rosidl_interface_packages</member_of_group>
 ```
@@ -350,7 +359,7 @@ Dan source instalasi.
 . install/setup.bash
 ```
 
-Buatlah sebuah _package_ baru bernama `calculator` dalam folder `src`.
+Buatlah sebuah _package_ baru bernama `calculator` dalam folder `ros2_ws/src`.
 
 ```shell
 ros2 pkg create calculator --build-type ament_cmake --dependencies rclcpp interfaces --license Apache-2.0
@@ -481,7 +490,7 @@ Dan tambahkan file tersebut ke dalam `CMakeLists.txt` milik `interfaces`
 ```cmake
 rosidl_generate_interfaces(${PROJECT_NAME}
     "srv/Add.srv"
-    "action/Fibonacci.action" # Tambahkan ini
+    "action/Fibonacci.action" <-- Tambahkan ini
     DEPENDENCIES std_msgs
 )
 ```
@@ -489,53 +498,6 @@ rosidl_generate_interfaces(${PROJECT_NAME}
 Buatlah sebuah _package_ baru bernama `fibonnaci` dengan menjalankan perintah berikut:
 ```shell
 ros2 pkg create fibonacci --build-type ament_cmake --dependencies rclcpp rclcpp_action rclcpp_components interfaces --license Apache-2.0
-```
-
-Setelah itu, tambahkan file-file berikut:
-
-`include/fibonacci/visibility_control.h`
-```cpp
-#ifndef ACTION_TUTORIALS_CPP__VISIBILITY_CONTROL_H_
-#define ACTION_TUTORIALS_CPP__VISIBILITY_CONTROL_H_
-
-#ifdef __cplusplus
-extern "C"
-{
-#endif
-
-#if defined _WIN32 || defined __CYGWIN__
-  #ifdef __GNUC__
-    #define ACTION_TUTORIALS_CPP_EXPORT __attribute__ ((dllexport))
-    #define ACTION_TUTORIALS_CPP_IMPORT __attribute__ ((dllimport))
-  #else
-    #define ACTION_TUTORIALS_CPP_EXPORT __declspec(dllexport)
-    #define ACTION_TUTORIALS_CPP_IMPORT __declspec(dllimport)
-  #endif
-  #ifdef ACTION_TUTORIALS_CPP_BUILDING_DLL
-    #define ACTION_TUTORIALS_CPP_PUBLIC ACTION_TUTORIALS_CPP_EXPORT
-  #else
-    #define ACTION_TUTORIALS_CPP_PUBLIC ACTION_TUTORIALS_CPP_IMPORT
-  #endif
-  #define ACTION_TUTORIALS_CPP_PUBLIC_TYPE ACTION_TUTORIALS_CPP_PUBLIC
-  #define ACTION_TUTORIALS_CPP_LOCAL
-#else
-  #define ACTION_TUTORIALS_CPP_EXPORT __attribute__ ((visibility("default")))
-  #define ACTION_TUTORIALS_CPP_IMPORT
-  #if __GNUC__ >= 4
-    #define ACTION_TUTORIALS_CPP_PUBLIC __attribute__ ((visibility("default")))
-    #define ACTION_TUTORIALS_CPP_LOCAL  __attribute__ ((visibility("hidden")))
-  #else
-    #define ACTION_TUTORIALS_CPP_PUBLIC
-    #define ACTION_TUTORIALS_CPP_LOCAL
-  #endif
-  #define ACTION_TUTORIALS_CPP_PUBLIC_TYPE
-#endif
-
-#ifdef __cplusplus
-}
-#endif
-
-#endif  // ACTION_TUTORIALS_CPP__VISIBILITY_CONTROL_H_
 ```
 
 `src/server.cpp`
@@ -550,8 +512,6 @@ extern "C"
 #include "rclcpp_components/register_node_macro.hpp"
 #include "interfaces/action/fibonacci.hpp"
 
-#include "fibonacci/visibility_control.h"
-
 namespace action_tutorials_cpp
 {
 class FibonacciActionServer : public rclcpp::Node
@@ -560,7 +520,6 @@ public:
   using Fibonacci = interfaces::action::Fibonacci;
   using GoalHandleFibonacci = rclcpp_action::ServerGoalHandle<Fibonacci>;
 
-  ACTION_TUTORIALS_CPP_PUBLIC
   explicit FibonacciActionServer(const rclcpp::NodeOptions & options = rclcpp::NodeOptions())
   : Node("fibonacci_action_server", options)
   {
@@ -763,8 +722,6 @@ add_library(action_server SHARED
 target_include_directories(action_server PRIVATE
   $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include>
   $<INSTALL_INTERFACE:include>)
-target_compile_definitions(action_server
-  PRIVATE "ACTION_TUTORIALS_CPP_BUILDING_DLL")
 ament_target_dependencies(action_server
   "interfaces"
   "rclcpp"
@@ -782,8 +739,6 @@ add_library(action_client SHARED
 target_include_directories(action_client PRIVATE
   $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include>
   $<INSTALL_INTERFACE:include>)
-target_compile_definitions(action_client
-  PRIVATE "ACTION_TUTORIALS_CPP_BUILDING_DLL")
 ament_target_dependencies(action_client
   "interfaces"
   "rclcpp"
@@ -823,3 +778,4 @@ Untuk mendapat input dari joystick XBox, kalian dapat menggunakan package [joy](
 
 https://docs.ros.org/en/humble/Tutorials/Beginner-CLI-Tools.html
 https://github.com/Grydr/ros2-ws-tutorial
+https://github.com/ros2/examples/
