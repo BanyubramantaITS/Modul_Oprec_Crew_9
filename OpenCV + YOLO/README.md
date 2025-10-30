@@ -146,7 +146,7 @@ Sama dengan BGR. Bedanya, posisi _channel_ B dan R ditukar. Format ini merupakan
 
 <div align="center">
 <div style="background-color: white; max-width: 24em;">
-<img alt="HSV Color Space" src="https://buzzneers.com/wp-content/uploads/2020/08/HSV_color_solid_cylinder-2048x1536.png" />
+<img alt="HSV Color Space" src="https://opencv.org/wp-content/uploads/2025/04/hsv.jpg" />
 </div>
 </div>
 
